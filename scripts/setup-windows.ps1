@@ -6,85 +6,248 @@ $Utf8Encoding = New-Object System.Text.UTF8Encoding $false
 $OutputEncoding = $Utf8Encoding
 
 $Root = Split-Path -Parent $PSScriptRoot
-$Dashboard = Join-Path $Root "start.html"
-$Desktop = [Environment]::GetFolderPath("Desktop")
-$ShortcutPath = Join-Path $Desktop "GF2 IT Dashboard.url"
+. (Join-Path $PSScriptRoot "setup-config.ps1")
+. (Join-Path $PSScriptRoot "setup-checks.ps1")
 
-$Links = @(
-    @{ Name = "Office 365 / skolemail"; Url = "https://www.office.com/" },
-    @{ Name = "Moodle"; Url = "https://online.neg.dk/login/index.php" },
-    @{ Name = "Lectio"; Url = "https://www.lectio.dk/lectio/769/default.aspx" },
-    @{ Name = "PraxisOnline"; Url = "https://authentication.praxis.dk/Account/Login?ReturnUrl=%2Fconnect%2Fauthorize%3Fclient_id%3DPraxisOnlinev2%26redirect_uri%3Dhttps%253A%252F%252Fonline.praxis.dk%252Fauthentication%252Flogin-callback%26response_type%3Dcode%26scope%3Dopenid%2520profile%2520PraxisOnlineClient%26state%3Debe8a1c6ff5f4f98b3014db0c5dc752d%26code_challenge%3DEa2At8GN59IETq2ud1CQuReFA7oUdSLXkB58eploqic%26code_challenge_method%3DS256%26response_mode%3Dquery" },
-    @{ Name = "OneDrive"; Url = "https://www.office.com/launch/onedrive" },
-    @{ Name = "SketchUp / Trimble"; Url = "https://id.trimble.com/ui/sign_in.html?state=eyJhbGciOiJSUzI1NiIsImtpZCI6IjIiLCJ0eXAiOiJKV1QifQ.eyJvYXV0aF9wYXJhbWV0ZXJzIjp7ImNsaWVudF9pZCI6ImNiMzg4Yzk2LTY2YjUtNDdhMS04MzZmLWFlYzQ0YTdmMGJjYSIsInJlZGlyZWN0X3VyaSI6Imh0dHBzOi8vd3d3LnRyaW1ibGUuY29tL2xvZ2luIiwicmVzcG9uc2VfdHlwZSI6ImNvZGUiLCJzY29wZSI6Im9wZW5pZCBpYW0gdHJpbWJsZS1teHAtbG9naW4gVENNaWRkbGV3YXJlIERYLVRyaWFscy1BcHAiLCJzdGF0ZSI6Ii9lbiJ9LCJleHRyYV9wYXJhbWV0ZXJzIjp7fSwiaW50ZXJuYWxfcGFyYW1ldGVycyI6eyJzZW5kX2FjY291bnRfaWRfaW5fY2xhaW1zIjpmYWxzZSwiaXNfaW50ZXJuYWwiOnRydWV9LCJleHAiOiIyMDI2LTA0LTI5IDExOjQ2OjMyLjc4MzIzMCIsIm5iZiI6MTc3NzQ2MjU5MiwiZXhwVHMiOjE3Nzc0NjMxOTIsInJlcV9leHAiOiIyMDI2LTA0LTI5IDExOjM4OjMyLjc4MzI1NyIsInRjcF9yZXF1ZXN0X2lkIjoiOGYxZWI1ZWY2OGU3NGI4MmFhZTdkN2FhM2I3NmRjNmUiLCJjb3JyZWxhdGlvbl9pZCI6IjNkZWE0OWZjZWUxZjQyOGU4ZThhMWZmZGI2MTg2NTA5XzE3Nzc0NDU1OTQiLCJhcHBfZGF0YSI6eyJzaG93X290cF9tYW5kYXRlX2Jhbm5lciI6ZmFsc2UsImlzX2ZlZGVyYXRpb25fZGlzYWxsb3dlZCI6ZmFsc2UsImRpc2FsbG93ZWRfZmVkZXJhdGlvbl9pZHMiOltdfSwic3RhdGVfdG9rZW5faWQiOiI2ZGQ1NzUyNS1iNTFlLTQzZGQtODdmMy0xNGFjOWQ4NTJjOWUiLCJ1c2VyX3R5cGUiOjAsInVhbSI6MSwiaXBtIjpbMiwwLDAsMCwwLDJdfQ.dOKzGl37C4pC_cQBbZsoN9h1Rze0IlpRbkzyofM6ewYnITvDUb2EFcGRjlvq_ukZHuC61rYkDFGpxWqlkXKqrZp7Q2Gr3VkEb61bb5r998mbj1qB30P2ZVPRBglzF9W_bwUmUCLznDUcHf72KPk8HzY55su9Fud3GuQhRap4sanAhkHw5gj-EsRE-qXaG9FXT-3TzPQa-UFh_Wt6zMikDD84tXOFz0y5Cay8cfCxfgDfAFqm3GUaGZJInhDDfLL8OpjuupRwAuWdlyeMiCsfiTcSe9-g2XPLvEUDLflYd62eiaBEYMgss5oVBWlITnIr_tv869nfafOYj_d4lrFkpg" },
-    @{ Name = "NEG hjemmeside"; Url = "https://www.neg.dk/" }
-)
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+[System.Windows.Forms.Application]::EnableVisualStyles()
 
-function Write-Section {
-    param([string]$Text)
-    Write-Host ""
-    Write-Host "== $Text ==" -ForegroundColor Cyan
-}
+$DashboardPath = Join-Path $Root $SetupConfig.DashboardFile
+$ShortcutPath = Join-Path ([Environment]::GetFolderPath("Desktop")) $SetupConfig.DesktopShortcutName
+$SafetyReminder = "Assistenten beder aldrig om adgangskoder, MitID eller UNI-Login."
+$CurrentStepIndex = 0
 
-function Open-Link {
-    param([string]$Url)
-    Start-Process $Url
-    Start-Sleep -Milliseconds 600
-}
-
-Write-Section "GF2 IT setup-assistent til Windows"
-Write-Host "Assistenten gemmer ingen brugernavne, adgangskoder eller MitID-oplysninger."
-
-if (Test-Path -LiteralPath $Dashboard) {
-    $DashboardUri = (Get-Item -LiteralPath $Dashboard).FullName
-    Set-Content -LiteralPath $ShortcutPath -Encoding ASCII -Value @(
-        "[InternetShortcut]",
-        "URL=file:///$($DashboardUri.Replace('\','/'))"
+function Set-StatusText {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Message
     )
-    Write-Host "Skrivebordsgenvej oprettet: $ShortcutPath"
-}
-else {
-    Write-Host "Dashboardet blev ikke fundet ved: $Dashboard" -ForegroundColor Yellow
+
+    $StatusLabel.Text = $Message
 }
 
-Write-Section "Systemtjek"
-$Os = Get-CimInstance -ClassName Win32_OperatingSystem
-Write-Host "Windows: $($Os.Caption) $($Os.Version)"
-
-$SModeSignals = Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\CI\Policy" -ErrorAction SilentlyContinue
-if ($SModeSignals -and $SModeSignals.SkuPolicyRequired -eq 1) {
-    Write-Host "Mulig Windows S-mode fundet. Installation af programmer kan være blokeret." -ForegroundColor Yellow
-}
-else {
-    Write-Host "Der blev ikke fundet et klart S-mode signal."
+function Get-StepProgressText {
+    $displayIndex = $CurrentStepIndex + 1
+    return "Trin $displayIndex af $($SetupSteps.Count)"
 }
 
-Write-Section "Åbn dashboard"
-if (Test-Path -LiteralPath $Dashboard) {
-    Start-Process $Dashboard
+function Get-WifiStatusText {
+    $ssid = Get-ActiveWifiSsid
+    if ($ssid -eq $SetupConfig.TargetWifi) {
+        return "Wi-Fi: Du er på $($SetupConfig.TargetWifi)."
+    }
+
+    if ($ssid -eq $SetupConfig.GuestWifi) {
+        return "Wi-Fi: Du er på $($SetupConfig.GuestWifi). Brug $($SetupConfig.TargetWifi), hvis skolens personale beder om det."
+    }
+
+    if ([string]::IsNullOrWhiteSpace($ssid)) {
+        return "Wi-Fi: Aktivt netværk er ukendt."
+    }
+
+    return "Wi-Fi: Aktivt netværk er $ssid. Målet er $($SetupConfig.TargetWifi)."
 }
 
-Write-Section "Åbn skole- og programlinks"
-foreach ($Link in $Links) {
-    $Answer = Read-Host "Åbn $($Link.Name)? Skriv j for ja"
-    if ($Answer -match "^[jJ]$") {
-        Open-Link $Link.Url
+function Render-Step {
+    $step = $SetupSteps[$CurrentStepIndex]
+    $Form.Text = $SetupConfig.Title
+    $ProgressLabel.Text = Get-StepProgressText
+    $TitleLabel.Text = $step.Title
+    $BodyTextBox.Text = $step.Body
+    $PrimaryButton.Text = $step.Button
+    $PrimaryButton.Enabled = $true
+
+    if ($step.Contains("Warning") -and -not [string]::IsNullOrWhiteSpace($step.Warning)) {
+        $WarningLabel.Text = $step.Warning
+        $WarningPanel.Visible = $true
+    }
+    else {
+        $WarningLabel.Text = ""
+        $WarningPanel.Visible = $false
+    }
+
+    if ($step.Kind -eq "wifi") {
+        Set-StatusText (Get-WifiStatusText)
+    }
+    elseif ($step.Kind -eq "finish") {
+        Set-StatusText "Klar til at oprette genvej og åbne dashboardet."
+    }
+    elseif ($step.Kind -eq "manual") {
+        Set-StatusText $SafetyReminder
+    }
+    else {
+        Set-StatusText "Klar."
+    }
+
+    if ($CurrentStepIndex -ge ($SetupSteps.Count - 1)) {
+        $NextButton.Text = "Luk"
+    }
+    else {
+        $NextButton.Text = "Næste"
     }
 }
 
-Write-Section "SketchUp"
-$Winget = Get-Command winget -ErrorAction SilentlyContinue
-if ($Winget) {
-    $Answer = Read-Host "Forsøg at søge efter SketchUp med winget? Skriv j for ja"
-    if ($Answer -match "^[jJ]$") {
-        winget search SketchUp
-        Write-Host "Hvis den rigtige SketchUp-version vises, kan installation køres manuelt fra winget eller SketchUp-siden."
+function Invoke-StepAction {
+    $step = $SetupSteps[$CurrentStepIndex]
+
+    try {
+        switch ($step.Kind) {
+            "manual" {
+                [System.Windows.Forms.MessageBox]::Show(
+                    $SetupConfig.SafetyText,
+                    $SetupConfig.Title,
+                    [System.Windows.Forms.MessageBoxButtons]::OK,
+                    [System.Windows.Forms.MessageBoxIcon]::Information
+                ) | Out-Null
+                Set-StatusText "Sikkerhedsteksten er vist."
+            }
+            "wifi" {
+                Open-WifiSettings
+                Set-StatusText "$(Get-WifiStatusText) Windows Wi-Fi-indstillinger er åbnet."
+            }
+            "link" {
+                Open-SetupLink $step.Url
+                Set-StatusText "Log ind på den officielle side, og klik Færdig her i assistenten, når trinnet er klaret."
+            }
+            "sketchup" {
+                if (Test-WindowsSMode) {
+                    Open-SetupLink $step.Url
+                    Set-StatusText "Windows S-mode kan blokere installation. SketchUp fallback-siden er åbnet."
+                    return
+                }
+
+                $PrimaryButton.Enabled = $false
+                Set-StatusText "Starter SketchUp-installation via winget..."
+                [System.Windows.Forms.Application]::DoEvents()
+                # Equivalent command: winget install --id $($SetupConfig.SketchUpPackageId) -e --source winget
+                $result = Install-SketchUpPackage $SetupConfig.SketchUpPackageId
+                if ($result.Success) {
+                    Set-StatusText $result.Message
+                }
+                else {
+                    Open-SetupLink $step.Url
+                    Set-StatusText "$($result.Message) SketchUp fallback-siden er åbnet."
+                }
+            }
+            "finish" {
+                if (New-DashboardShortcut -DashboardPath $DashboardPath -ShortcutPath $ShortcutPath) {
+                    Set-StatusText "Skrivebordsgenvej oprettet. Dashboardet åbnes."
+                }
+                else {
+                    Set-StatusText "Dashboardet blev ikke fundet ved $DashboardPath."
+                }
+
+                if (Test-Path -LiteralPath $DashboardPath) {
+                    Start-Process $DashboardPath
+                }
+            }
+            default {
+                Set-StatusText "Ukendt trin: $($step.Kind)"
+            }
+        }
+    }
+    catch {
+        Set-StatusText "Fejl: $($_.Exception.Message)"
+    }
+    finally {
+        if (-not $Form.IsDisposed) {
+            $PrimaryButton.Enabled = $true
+        }
     }
 }
-else {
-    Write-Host "winget blev ikke fundet. Brug SketchUp-linket som manuel fallback." -ForegroundColor Yellow
+
+function Move-NextStep {
+    if ($CurrentStepIndex -ge ($SetupSteps.Count - 1)) {
+        $Form.Close()
+        return
+    }
+
+    $script:CurrentStepIndex += 1
+    Render-Step
 }
 
-Write-Section "Færdig"
-Write-Host "Luk vinduet når eleven er videre. Brug dashboardet som manuel fallback."
-Read-Host "Tryk Enter for at lukke"
+$Form = New-Object System.Windows.Forms.Form
+$Form.Text = "GF2 IT Setup"
+$Form.StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen
+$Form.Size = New-Object System.Drawing.Size(760, 520)
+$Form.MinimumSize = New-Object System.Drawing.Size(720, 500)
+$Form.Font = New-Object System.Drawing.Font("Segoe UI", 10)
+$Form.BackColor = [System.Drawing.Color]::FromArgb(248, 249, 251)
+
+$HeaderPanel = New-Object System.Windows.Forms.Panel
+$HeaderPanel.Dock = [System.Windows.Forms.DockStyle]::Top
+$HeaderPanel.Height = 96
+$HeaderPanel.BackColor = [System.Drawing.Color]::White
+$Form.Controls.Add($HeaderPanel)
+
+$ProgressLabel = New-Object System.Windows.Forms.Label
+$ProgressLabel.AutoSize = $true
+$ProgressLabel.Location = New-Object System.Drawing.Point(28, 18)
+$ProgressLabel.ForeColor = [System.Drawing.Color]::FromArgb(92, 101, 112)
+$HeaderPanel.Controls.Add($ProgressLabel)
+
+$TitleLabel = New-Object System.Windows.Forms.Label
+$TitleLabel.AutoSize = $false
+$TitleLabel.Location = New-Object System.Drawing.Point(24, 40)
+$TitleLabel.Size = New-Object System.Drawing.Size(690, 40)
+$TitleLabel.Font = New-Object System.Drawing.Font("Segoe UI Semibold", 20)
+$TitleLabel.ForeColor = [System.Drawing.Color]::FromArgb(20, 29, 38)
+$HeaderPanel.Controls.Add($TitleLabel)
+
+$BodyTextBox = New-Object System.Windows.Forms.TextBox
+$BodyTextBox.Multiline = $true
+$BodyTextBox.ReadOnly = $true
+$BodyTextBox.BorderStyle = [System.Windows.Forms.BorderStyle]::None
+$BodyTextBox.BackColor = $Form.BackColor
+$BodyTextBox.Location = New-Object System.Drawing.Point(28, 126)
+$BodyTextBox.Size = New-Object System.Drawing.Size(690, 150)
+$BodyTextBox.Font = New-Object System.Drawing.Font("Segoe UI", 12)
+$BodyTextBox.ForeColor = [System.Drawing.Color]::FromArgb(36, 45, 55)
+$BodyTextBox.TabStop = $false
+$Form.Controls.Add($BodyTextBox)
+
+$WarningPanel = New-Object System.Windows.Forms.Panel
+$WarningPanel.Location = New-Object System.Drawing.Point(28, 292)
+$WarningPanel.Size = New-Object System.Drawing.Size(690, 62)
+$WarningPanel.BackColor = [System.Drawing.Color]::FromArgb(255, 247, 224)
+$WarningPanel.Visible = $false
+$Form.Controls.Add($WarningPanel)
+
+$WarningLabel = New-Object System.Windows.Forms.Label
+$WarningLabel.AutoSize = $false
+$WarningLabel.Location = New-Object System.Drawing.Point(14, 11)
+$WarningLabel.Size = New-Object System.Drawing.Size(660, 42)
+$WarningLabel.ForeColor = [System.Drawing.Color]::FromArgb(102, 73, 0)
+$WarningLabel.Font = New-Object System.Drawing.Font("Segoe UI Semibold", 10)
+$WarningPanel.Controls.Add($WarningLabel)
+
+$StatusLabel = New-Object System.Windows.Forms.Label
+$StatusLabel.AutoSize = $false
+$StatusLabel.Location = New-Object System.Drawing.Point(28, 370)
+$StatusLabel.Size = New-Object System.Drawing.Size(690, 44)
+$StatusLabel.ForeColor = [System.Drawing.Color]::FromArgb(67, 76, 87)
+$Form.Controls.Add($StatusLabel)
+
+$ButtonPanel = New-Object System.Windows.Forms.Panel
+$ButtonPanel.Dock = [System.Windows.Forms.DockStyle]::Bottom
+$ButtonPanel.Height = 78
+$ButtonPanel.BackColor = [System.Drawing.Color]::White
+$Form.Controls.Add($ButtonPanel)
+
+$PrimaryButton = New-Object System.Windows.Forms.Button
+$PrimaryButton.Size = New-Object System.Drawing.Size(210, 38)
+$PrimaryButton.Location = New-Object System.Drawing.Point(278, 20)
+$PrimaryButton.UseVisualStyleBackColor = $true
+$PrimaryButton.Add_Click({ Invoke-StepAction })
+$ButtonPanel.Controls.Add($PrimaryButton)
+
+$NextButton = New-Object System.Windows.Forms.Button
+$NextButton.Size = New-Object System.Drawing.Size(110, 38)
+$NextButton.Location = New-Object System.Drawing.Point(608, 20)
+$NextButton.UseVisualStyleBackColor = $true
+$NextButton.Add_Click({ Move-NextStep })
+$ButtonPanel.Controls.Add($NextButton)
+
+Render-Step
+[System.Windows.Forms.Application]::Run($Form)
