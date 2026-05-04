@@ -1,4 +1,4 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 
 $Root = Split-Path -Parent $PSScriptRoot
 $GitAttributes = Join-Path $Root ".gitattributes"
@@ -24,7 +24,7 @@ function Assert-Contains {
         [string]$Needle,
         [string]$Label
     )
-    if ($Content -notlike "*$Needle*") {
+    if (-not $Content.Contains($Needle)) {
         throw "Missing required content '$Label': $Needle"
     }
 }
@@ -35,8 +35,27 @@ function Assert-NotContains {
         [string]$Needle,
         [string]$Label
     )
-    if ($Content -like "*$Needle*") {
+    if ($Content.Contains($Needle)) {
         throw "Forbidden content '$Label': $Needle"
+    }
+}
+
+function Assert-StartsWithBytes {
+    param(
+        [string]$Path,
+        [byte[]]$Expected,
+        [string]$Label
+    )
+
+    $Bytes = [System.IO.File]::ReadAllBytes($Path)
+    if ($Bytes.Length -lt $Expected.Length) {
+        throw "File too short for '$Label': $Path"
+    }
+
+    for ($Index = 0; $Index -lt $Expected.Length; $Index++) {
+        if ($Bytes[$Index] -ne $Expected[$Index]) {
+            throw "Missing expected byte prefix '$Label': $Path"
+        }
     }
 }
 
@@ -49,12 +68,12 @@ Assert-File $MacSetup
 Assert-File $MacLauncher
 Assert-File $BuildPackage
 
-$GitAttributesContent = Get-Content -Raw -LiteralPath $GitAttributes
-$Html = Get-Content -Raw -LiteralPath $StartHtml
-$WindowsSetupContent = Get-Content -Raw -LiteralPath $WindowsSetup
-$WindowsLauncherContent = Get-Content -Raw -LiteralPath $WindowsLauncher
-$MacSetupContent = Get-Content -Raw -LiteralPath $MacSetup
-$MacLauncherContent = Get-Content -Raw -LiteralPath $MacLauncher
+$GitAttributesContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $GitAttributes
+$Html = Get-Content -Raw -Encoding UTF8 -LiteralPath $StartHtml
+$WindowsSetupContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $WindowsSetup
+$WindowsLauncherContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $WindowsLauncher
+$MacSetupContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $MacSetup
+$MacLauncherContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $MacLauncher
 
 Assert-Contains $Html "GF2 IT Dashboard" "dashboard title"
 Assert-Contains $Html "ET FÆLLESSKAB MED PLADS TIL DIG" "hero kicker"
@@ -89,7 +108,9 @@ foreach ($ExpectedLink in @(
 
 Assert-Contains $WindowsSetupContent "Assistenten gemmer ingen brugernavne" "credential safety"
 Assert-Contains $WindowsSetupContent "GF2 IT Dashboard.url" "desktop shortcut"
+Assert-Contains $WindowsSetupContent "[Console]::OutputEncoding" "PowerShell UTF-8 output"
 Assert-Contains $WindowsSetupContent "Read-Host `"Åbn" "asks before opening links"
+Assert-Contains $WindowsLauncherContent "chcp 65001" "Windows launcher UTF-8 codepage"
 Assert-Contains $WindowsLauncherContent "scripts\setup-windows.ps1" "Windows launcher target"
 Assert-Contains $MacSetupContent "GF2 IT setup-assistent til Mac" "Mac setup heading"
 Assert-Contains $MacSetupContent "Assistenten gemmer ingen brugernavne" "Mac credential safety"
@@ -103,6 +124,8 @@ Assert-NotContains $Html "url(`"http" "remote CSS image"
 Assert-NotContains $Html "src=`"http" "remote image/script source"
 Assert-NotContains $Html "password" "credential wording"
 Assert-NotContains $Html "adgangskode gemmes" "stored password wording"
+
+Assert-StartsWithBytes $WindowsSetup ([byte[]](0xEF, 0xBB, 0xBF)) "Windows PowerShell UTF-8 BOM"
 
 if (Test-Path -LiteralPath $ZipPath) {
     Add-Type -AssemblyName System.IO.Compression.FileSystem

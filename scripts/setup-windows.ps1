@@ -1,4 +1,9 @@
-$ErrorActionPreference = "Continue"
+﻿$ErrorActionPreference = "Continue"
+
+$Utf8Encoding = New-Object System.Text.UTF8Encoding $false
+[Console]::InputEncoding = $Utf8Encoding
+[Console]::OutputEncoding = $Utf8Encoding
+$OutputEncoding = $Utf8Encoding
 
 $Root = Split-Path -Parent $PSScriptRoot
 $Dashboard = Join-Path $Root "start.html"
