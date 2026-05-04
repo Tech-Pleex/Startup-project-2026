@@ -49,13 +49,13 @@ function New-DashboardShortcut {
     }
 
     $resolvedDashboardPath = (Resolve-Path -LiteralPath $DashboardPath).ProviderPath
-    $shortcutUrl = 'file:///' + ($resolvedDashboardPath -replace '\\', '/')
+    $shortcutUrl = [System.Uri]::new($resolvedDashboardPath).AbsoluteUri
     $content = @(
         '[InternetShortcut]'
         "URL=$shortcutUrl"
     )
 
-    Set-Content -LiteralPath $ShortcutPath -Value $content -Encoding ASCII
+    Set-Content -LiteralPath $ShortcutPath -Value $content -Encoding UTF8
     return $true
 }
 
