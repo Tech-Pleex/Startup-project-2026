@@ -1,4 +1,4 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 
 $Root = Split-Path -Parent $PSScriptRoot
 $LandingPage = Join-Path $Root "index.html"
@@ -13,7 +13,7 @@ $StartHtml = Join-Path $Root "start.html"
 
 function Assert-File {
     param([string]$Path)
-    if (-not (Test-Path -LiteralPath $Path)) {
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
         throw "Missing required file: $Path"
     }
 }
@@ -89,7 +89,7 @@ Assert-Contains $ConfigContent "neg04026@edu.neg.dk" "school email"
 Assert-Contains $ConfigContent "UNI-Login" "UNI-Login"
 Assert-Contains $ConfigContent "MitID" "MitID"
 Assert-Contains $ConfigContent "NEG Guest" "guest Wi-Fi"
-Assert-Contains $ConfigContent "`"NEG" "NEG network prefix"
+Assert-Contains $ConfigContent "TargetWifi = `"NEG`"" "target Wi-Fi"
 
 Assert-Contains $ChecksContent "Get-ActiveWifiSsid" "Wi-Fi helper"
 Assert-Contains $ChecksContent "Test-WingetAvailable" "winget helper"
