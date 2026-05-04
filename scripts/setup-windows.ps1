@@ -84,7 +84,7 @@ function Render-Step {
         $NextButton.Text = "Luk"
     }
     else {
-        $NextButton.Text = "Næste"
+        $NextButton.Text = "Færdig - næste"
     }
 }
 
