@@ -8,6 +8,7 @@ $WindowsSetup = Join-Path $Root "scripts\setup-windows.ps1"
 $WindowsLauncher = Join-Path $Root "Start Windows setup.cmd"
 $MacSetup = Join-Path $Root "scripts\setup-mac.sh"
 $MacLauncher = Join-Path $Root "Start Mac setup.command"
+$BuildPackage = Join-Path $Root "scripts\build-package.ps1"
 $ZipPath = Join-Path $Root "dist\IT-opstart-GF2.zip"
 
 function Assert-File {
@@ -46,6 +47,7 @@ Assert-File $WindowsSetup
 Assert-File $WindowsLauncher
 Assert-File $MacSetup
 Assert-File $MacLauncher
+Assert-File $BuildPackage
 
 $GitAttributesContent = Get-Content -Raw -LiteralPath $GitAttributes
 $Html = Get-Content -Raw -LiteralPath $StartHtml
