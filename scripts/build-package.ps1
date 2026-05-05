@@ -2,15 +2,16 @@ $ErrorActionPreference = "Stop"
 
 $Root = Split-Path -Parent $PSScriptRoot
 $Dist = Join-Path $Root "dist"
-$Zip = Join-Path $Dist "IT-opstart-GF2.zip"
+$Zip = Join-Path $Dist "GF2-IT-Setup-Windows.zip"
 
 $Required = @(
+    "index.html",
     "start.html",
     "assets\neg-hero-transition.png",
     "scripts\setup-windows.ps1",
-    "scripts\setup-mac.sh",
-    "Start Windows setup.cmd",
-    "Start Mac setup.command"
+    "scripts\setup-config.ps1",
+    "scripts\setup-checks.ps1",
+    "Start Windows setup.cmd"
 )
 
 function Assert-InDirectory {
