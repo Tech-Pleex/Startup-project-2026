@@ -99,6 +99,7 @@ Assert-Contains $Html "OneDrive" "fixed link"
 Assert-Contains $Html "SketchUp / Trimble" "fixed link"
 Assert-Contains $Html "NEG hjemmeside" "fixed link"
 Assert-Contains $Html "+45 72 290 100" "absence phone"
+Assert-Contains $Html "Udviklet af Jesper Reenberg" "developer credit"
 
 foreach ($ExpectedLink in @(
     "https://online.neg.dk/login/index.php",

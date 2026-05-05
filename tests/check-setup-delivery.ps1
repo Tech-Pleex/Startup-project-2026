@@ -89,6 +89,7 @@ Assert-Contains $LandingHtml "dist/GF2-IT-Setup-Windows.zip" "download package p
 Assert-Contains $LandingHtml "Vi beder aldrig om adgangskoder" "credential safety"
 Assert-Contains $LandingHtml "start.html" "dashboard entry"
 Assert-Contains $LandingHtml "GitHub" "GitHub fallback"
+Assert-Contains $LandingHtml "Udviklet af Jesper Reenberg" "developer credit"
 
 Assert-Contains $ConfigContent "Trimble.SketchUp.2026" "SketchUp package"
 Assert-Contains $ConfigContent "PraxisOnline" "PraxisOnline service"
