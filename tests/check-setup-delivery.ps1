@@ -1,6 +1,7 @@
 ﻿$ErrorActionPreference = "Stop"
 
 $Root = Split-Path -Parent $PSScriptRoot
+$Readme = Join-Path $Root "README.md"
 $LandingPage = Join-Path $Root "index.html"
 $HeroImage = Join-Path $Root "assets\neg-hero-transition.png"
 $WindowsLauncher = Join-Path $Root "Start Windows setup.cmd"
@@ -59,6 +60,7 @@ function Assert-ZipContains {
     }
 }
 
+Assert-File $Readme
 Assert-File $LandingPage
 Assert-File $HeroImage
 Assert-File $WindowsLauncher
@@ -68,12 +70,17 @@ Assert-File $SetupChecks
 Assert-File $BuildScript
 Assert-File $StartHtml
 
+$ReadmeContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $Readme
 $LandingHtml = Get-Content -Raw -Encoding UTF8 -LiteralPath $LandingPage
 $LauncherContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $WindowsLauncher
 $SetupContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $SetupScript
 $ConfigContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $SetupConfig
 $ChecksContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $SetupChecks
 $BuildContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $BuildScript
+
+Assert-Contains $ReadmeContent "never asks for passwords, MitID, or UNI-Login" "README credential safety"
+Assert-Contains $ReadmeContent "dist/GF2-IT-Setup-Windows.zip" "README package path"
+Assert-Contains $ReadmeContent "Start Windows setup.cmd" "README launcher"
 
 Assert-Contains $LandingHtml "GF2 IT Setup" "landing title"
 Assert-Contains $LandingHtml "assets/neg-hero-transition.png" "landing hero asset"
