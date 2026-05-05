@@ -9,6 +9,7 @@ Concrete items can later become GitHub issues or feature branches when they are 
 - Consider moving the computer choice to the landing page for a clearer first decision.
 - Add links to SketchUp video tutorials when the tutorial set is ready.
 - Plan a separate dashboard refresh for student and teacher use cases.
+- Package the Windows setup as a single executable or installer to reduce download friction for students and teachers.
 
 ## Later
 
