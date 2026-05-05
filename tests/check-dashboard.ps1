@@ -5,6 +5,8 @@ $GitAttributes = Join-Path $Root ".gitattributes"
 $StartHtml = Join-Path $Root "start.html"
 $HeroImage = Join-Path $Root "assets\neg-hero-transition.png"
 $WindowsSetup = Join-Path $Root "scripts\setup-windows.ps1"
+$SetupConfig = Join-Path $Root "scripts\setup-config.ps1"
+$SetupChecks = Join-Path $Root "scripts\setup-checks.ps1"
 $WindowsLauncher = Join-Path $Root "Start Windows setup.cmd"
 $MacSetup = Join-Path $Root "scripts\setup-mac.sh"
 $MacLauncher = Join-Path $Root "Start Mac setup.command"
@@ -63,6 +65,8 @@ Assert-File $GitAttributes
 Assert-File $StartHtml
 Assert-File $HeroImage
 Assert-File $WindowsSetup
+Assert-File $SetupConfig
+Assert-File $SetupChecks
 Assert-File $WindowsLauncher
 Assert-File $MacSetup
 Assert-File $MacLauncher
@@ -71,6 +75,7 @@ Assert-File $BuildPackage
 $GitAttributesContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $GitAttributes
 $Html = Get-Content -Raw -Encoding UTF8 -LiteralPath $StartHtml
 $WindowsSetupContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $WindowsSetup
+$SetupConfigContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $SetupConfig
 $WindowsLauncherContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $WindowsLauncher
 $MacSetupContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $MacSetup
 $MacLauncherContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $MacLauncher
@@ -102,14 +107,22 @@ foreach ($ExpectedLink in @(
     "https://id.trimble.com/ui/sign_in.html?state="
 )) {
     Assert-Contains $Html $ExpectedLink "correct service URL"
-    Assert-Contains $WindowsSetupContent $ExpectedLink "correct Windows setup URL"
     Assert-Contains $MacSetupContent $ExpectedLink "correct Mac setup URL"
 }
 
-Assert-Contains $WindowsSetupContent "Assistenten gemmer ingen brugernavne" "credential safety"
-Assert-Contains $WindowsSetupContent "GF2 IT Dashboard.url" "desktop shortcut"
+foreach ($ExpectedLink in @(
+    "https://online.neg.dk/login/index.php",
+    "https://www.lectio.dk/lectio/769/default.aspx",
+    "https://online.praxis.dk/",
+    "https://sketchup.trimble.com/"
+)) {
+    Assert-Contains $SetupConfigContent $ExpectedLink "correct Windows setup URL"
+}
+
+Assert-Contains $SetupConfigContent "GF2 IT Dashboard.url" "desktop shortcut"
 Assert-Contains $WindowsSetupContent "[Console]::OutputEncoding" "PowerShell UTF-8 output"
-Assert-Contains $WindowsSetupContent "Read-Host `"Åbn" "asks before opening links"
+Assert-Contains $WindowsSetupContent "System.Windows.Forms" "Windows setup GUI"
+Assert-Contains $WindowsSetupContent "Assistenten beder aldrig om adgangskoder" "Windows setup safety"
 Assert-Contains $WindowsLauncherContent "chcp 65001" "Windows launcher UTF-8 codepage"
 Assert-Contains $WindowsLauncherContent "scripts\setup-windows.ps1" "Windows launcher target"
 Assert-Contains $MacSetupContent "GF2 IT setup-assistent til Mac" "Mac setup heading"
