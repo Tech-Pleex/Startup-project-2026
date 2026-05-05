@@ -103,8 +103,8 @@ Assert-Contains $Html "+45 72 290 100" "absence phone"
 foreach ($ExpectedLink in @(
     "https://online.neg.dk/login/index.php",
     "https://www.lectio.dk/lectio/769/default.aspx",
-    "https://authentication.praxis.dk/Account/Login?ReturnUrl=",
-    "https://id.trimble.com/ui/sign_in.html?state="
+    "https://online.praxis.dk/",
+    "https://sketchup.trimble.com/"
 )) {
     Assert-Contains $Html $ExpectedLink "correct service URL"
     Assert-Contains $MacSetupContent $ExpectedLink "correct Mac setup URL"
@@ -135,6 +135,8 @@ Assert-Contains $GitAttributesContent "*.command text eol=lf" "Mac launcher LF e
 
 Assert-NotContains $Html "url(`"http" "remote CSS image"
 Assert-NotContains $Html "src=`"http" "remote image/script source"
+Assert-NotContains $Html "ReturnUrl=" "sessionful Praxis URL"
+Assert-NotContains $Html "id.trimble.com/ui/sign_in.html?state=" "sessionful Trimble URL"
 Assert-NotContains $Html "password" "credential wording"
 Assert-NotContains $Html "adgangskode gemmes" "stored password wording"
 
