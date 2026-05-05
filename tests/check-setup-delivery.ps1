@@ -109,6 +109,10 @@ Assert-Contains $SetupContent "Assistenten beder aldrig om adgangskoder" "creden
 Assert-Contains $SetupContent "Get-ActiveWifiSsid" "Wi-Fi helper"
 Assert-Contains $SetupContent "winget install" "winget install"
 Assert-Contains $SetupContent "Start-Process" "process launcher"
+Assert-Contains $SetupContent "function Move-PreviousStep" "previous step navigation"
+Assert-Contains $SetupContent '$BackButton.Text = "Tilbage"' "back button label"
+Assert-Contains $SetupContent '$BackButton.Visible = $CurrentStepIndex -gt 0' "hide back button on first step"
+Assert-Contains $SetupContent '$BackButton.Add_Click({ Move-PreviousStep })' "back button click handler"
 
 Assert-Contains $LauncherContent "powershell.exe" "PowerShell launcher"
 Assert-Contains $LauncherContent "setup-windows.ps1" "setup target"

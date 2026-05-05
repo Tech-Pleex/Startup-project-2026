@@ -86,6 +86,8 @@ function Render-Step {
     else {
         $NextButton.Text = "Færdig - næste"
     }
+
+    $BackButton.Visible = $CurrentStepIndex -gt 0
 }
 
 function Invoke-StepAction {
@@ -167,6 +169,15 @@ function Move-NextStep {
     Render-Step
 }
 
+function Move-PreviousStep {
+    if ($CurrentStepIndex -le 0) {
+        return
+    }
+
+    $script:CurrentStepIndex -= 1
+    Render-Step
+}
+
 $Form = New-Object System.Windows.Forms.Form
 $Form.Text = "GF2 IT Setup"
 $Form.StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen
@@ -241,6 +252,15 @@ $PrimaryButton.Location = New-Object System.Drawing.Point(278, 20)
 $PrimaryButton.UseVisualStyleBackColor = $true
 $PrimaryButton.Add_Click({ Invoke-StepAction })
 $ButtonPanel.Controls.Add($PrimaryButton)
+
+$BackButton = New-Object System.Windows.Forms.Button
+$BackButton.Text = "Tilbage"
+$BackButton.Size = New-Object System.Drawing.Size(110, 38)
+$BackButton.Location = New-Object System.Drawing.Point(28, 20)
+$BackButton.UseVisualStyleBackColor = $true
+$BackButton.Visible = $false
+$BackButton.Add_Click({ Move-PreviousStep })
+$ButtonPanel.Controls.Add($BackButton)
 
 $NextButton = New-Object System.Windows.Forms.Button
 $NextButton.Size = New-Object System.Drawing.Size(110, 38)
