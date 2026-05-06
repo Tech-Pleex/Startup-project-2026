@@ -45,6 +45,11 @@ Base branch: `feature/setup-wizard`
   - Dashboard removes the completion query from the visible URL after applying it.
 - Reduced dashboard middle-column explanatory text size.
 - Redesigned the dashboard setup-assistant action so the browser no longer links directly to `.cmd` or `.command` files.
+- Moved platform choice to the landing page download flow:
+  - `Download setup` now opens a platform modal.
+  - Windows downloads `dist/GF2-IT-Setup-Windows.zip`.
+  - Mac is visible but disabled until a later Mac package feature.
+  - Dashboard no longer contains computer choice or platform launcher logic.
 - Rebuilt `dist/GF2-IT-Setup-Windows.zip` after code/content changes.
 
 ## Confirmed / Closed Discussion Points
@@ -58,7 +63,7 @@ Base branch: `feature/setup-wizard`
 
 ## Remaining Original Points
 
-9. Keep for later: move computer choice to landing page, dashboard prototypes, and SketchUp tutorial links.
+9. Keep for later: dashboard prototypes and SketchUp tutorial links.
 
 ## Verification Commands
 
