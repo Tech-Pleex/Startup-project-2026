@@ -1,11 +1,14 @@
 ﻿function Get-ActiveWifiSsid {
-    $interfaces = netsh wlan show interfaces 2>$null
+    $Output = netsh wlan show interfaces 2>$null
+    if (-not $Output) {
+        return $null
+    }
 
-    foreach ($line in $interfaces) {
-        if ($line -match '^\s*SSID\s+:\s*(.*)\s*$') {
-            $ssid = $Matches[1].Trim()
-            if ($ssid.Length -gt 0) {
-                return $ssid
+    foreach ($Line in $Output) {
+        if ($Line -match "^\s*SSID\s*:\s*(.+)$" -and $Line -notmatch "BSSID") {
+            $Ssid = $Matches[1].Trim()
+            if ($Ssid.Length -gt 0) {
+                return $Ssid
             }
         }
     }
@@ -22,8 +25,8 @@ function Test-WingetAvailable {
 }
 
 function Test-WindowsSMode {
-    $policy = Get-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\CI\Policy' -ErrorAction SilentlyContinue
-    return ($null -ne $policy -and $policy.SkuPolicyRequired -eq 1)
+    $Policy = Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\CI\Policy" -ErrorAction SilentlyContinue
+    return [bool]($Policy -and $Policy.SkuPolicyRequired -eq 1)
 }
 
 function Open-SetupLink {
@@ -44,18 +47,16 @@ function New-DashboardShortcut {
         [string]$ShortcutPath
     )
 
-    if (-not (Test-Path -LiteralPath $DashboardPath)) {
+    if (-not (Test-Path -LiteralPath $DashboardPath -PathType Leaf)) {
         return $false
     }
 
-    $resolvedDashboardPath = (Resolve-Path -LiteralPath $DashboardPath).ProviderPath
-    $shortcutUrl = [System.Uri]::new($resolvedDashboardPath).AbsoluteUri
-    $content = @(
-        '[InternetShortcut]'
-        "URL=$shortcutUrl"
+    $DashboardUri = (Get-Item -LiteralPath $DashboardPath).FullName.Replace("\", "/")
+    Set-Content -LiteralPath $ShortcutPath -Encoding ASCII -Value @(
+        "[InternetShortcut]",
+        "URL=file:///$DashboardUri"
     )
 
-    Set-Content -LiteralPath $ShortcutPath -Value $content -Encoding UTF8
     return $true
 }
 
@@ -72,27 +73,25 @@ function Install-SketchUpPackage {
         }
     }
 
-    $arguments = @(
-        'install'
-        '--id'
-        $PackageId
-        '-e'
-        '--source'
-        'winget'
-        '--accept-source-agreements'
-        '--accept-package-agreements'
+    $Arguments = @(
+        "install",
+        "--id", $PackageId,
+        "-e",
+        "--source", "winget",
+        "--accept-source-agreements",
+        "--accept-package-agreements"
     )
 
-    $process = Start-Process -FilePath 'winget' -ArgumentList $arguments -Wait -PassThru -WindowStyle Normal
-    if ($process.ExitCode -eq 0) {
+    $Process = Start-Process -FilePath "winget" -ArgumentList $Arguments -Wait -PassThru -WindowStyle Normal
+    if ($Process.ExitCode -eq 0) {
         return [ordered]@{
             Success = $true
-            Message = "SketchUp blev installeret."
+            Message = "SketchUp-installationen blev startet eller gennemfort."
         }
     }
 
     return [ordered]@{
         Success = $false
-        Message = "winget afsluttede med kode $($process.ExitCode)."
+        Message = "winget returnerede fejlkode $($Process.ExitCode)."
     }
 }
