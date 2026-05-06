@@ -21,7 +21,7 @@ Base branch: `feature/setup-wizard`
 - Work continues in the implementation worktree on `feature/setup-wizard-impl`.
 - The branch has not been merged into `feature/setup-wizard` yet.
 - The implementation branch has not intentionally been published to GitHub yet.
-- Latest confirmed clean commit: `0b5fdf8 feat: add developer credit`.
+- Latest confirmed clean commit: `8f1f779 style: refine landing page quick steps`.
 
 ## Completed In This Follow-Up Round
 
@@ -35,6 +35,10 @@ Base branch: `feature/setup-wizard`
 - Added developer credit:
   - Landing page footer: `Udviklet af Jesper Reenberg`.
   - Dashboard right column below the local-status notice.
+- Refined the landing page quick-start area:
+  - `Kom i gang på tre minutter` is now 90% transparent.
+  - The quick-start box no longer stretches too far to the right.
+  - The landing page lead text now matches the quick-start body text size.
 - Rebuilt `dist/GF2-IT-Setup-Windows.zip` after code/content changes.
 
 ## Confirmed / Closed Discussion Points
@@ -42,12 +46,12 @@ Base branch: `feature/setup-wizard`
 - Point 1 is approved: setup wizard back button.
 - Point 2 is clarified: landing page and setup wizard opened quickly because local test commands opened both manually. This is not a product bug.
 - Point 3 is approved: discreet developer credit.
+- Point 4 was explored and reverted. The extra `Efter download` block was removed because it duplicated the existing quick-start box.
+- Point 5 is approved: landing page quick-start transparency, box width, and lead text size.
 - Packaging as a single installer/executable is a future feature, not part of the current fix round.
 
 ## Remaining Original Points
 
-4. Add or document a walkthrough for exactly what happens when users click `Download Windows Setup`.
-5. Make the landing page `Kom i gang på tre minutter` box about 90% transparent so the image is more visible.
 6. Investigate dashboard/setup-wizard status sync. Current state: wizard finishing does not automatically set dashboard status to `Færdig`.
 7. Reduce dashboard explanatory text size in the middle column.
 8. Fix or redesign the dashboard `Start setup-assistent` link. Current browser behavior can show the `.cmd` file text instead of running it.
