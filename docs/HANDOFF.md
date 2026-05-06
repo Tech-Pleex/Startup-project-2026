@@ -39,6 +39,12 @@ Base branch: `feature/setup-wizard`
   - `Kom i gang på tre minutter` is now 90% transparent.
   - The quick-start box no longer stretches too far to the right.
   - The landing page lead text now matches the quick-start body text size.
+- Fixed dashboard/setup-wizard status sync:
+  - Setup wizard now opens `start.html?setup=complete` on finish.
+  - Dashboard reads the completion signal and marks the student checklist `Færdig` in local browser storage.
+  - Dashboard removes the completion query from the visible URL after applying it.
+- Reduced dashboard middle-column explanatory text size.
+- Redesigned the dashboard setup-assistant action so the browser no longer links directly to `.cmd` or `.command` files.
 - Rebuilt `dist/GF2-IT-Setup-Windows.zip` after code/content changes.
 
 ## Confirmed / Closed Discussion Points
@@ -52,9 +58,6 @@ Base branch: `feature/setup-wizard`
 
 ## Remaining Original Points
 
-6. Investigate dashboard/setup-wizard status sync. Current state: wizard finishing does not automatically set dashboard status to `Færdig`.
-7. Reduce dashboard explanatory text size in the middle column.
-8. Fix or redesign the dashboard `Start setup-assistent` link. Current browser behavior can show the `.cmd` file text instead of running it.
 9. Keep for later: move computer choice to landing page, dashboard prototypes, and SketchUp tutorial links.
 
 ## Verification Commands

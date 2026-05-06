@@ -18,6 +18,16 @@ $ShortcutPath = Join-Path ([Environment]::GetFolderPath("Desktop")) $SetupConfig
 $SafetyReminder = "Assistenten beder aldrig om adgangskoder, MitID eller UNI-Login."
 $CurrentStepIndex = 0
 
+function Get-DashboardCompletionUrl {
+    if (-not (Test-Path -LiteralPath $DashboardPath)) {
+        return $null
+    }
+
+    $dashboardFile = Get-Item -LiteralPath $DashboardPath
+    $dashboardUri = [System.Uri]$dashboardFile.FullName
+    return "$($dashboardUri.AbsoluteUri)?setup=complete"
+}
+
 function Set-StatusText {
     param(
         [Parameter(Mandatory = $true)]
@@ -140,8 +150,9 @@ function Invoke-StepAction {
                     Set-StatusText "Dashboardet blev ikke fundet ved $DashboardPath."
                 }
 
-                if (Test-Path -LiteralPath $DashboardPath) {
-                    Start-Process $DashboardPath
+                $dashboardCompletionUrl = Get-DashboardCompletionUrl
+                if ($dashboardCompletionUrl) {
+                    Start-Process $dashboardCompletionUrl
                 }
             }
             default {

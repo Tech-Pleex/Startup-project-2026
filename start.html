@@ -269,8 +269,8 @@
     .step p {
       margin: 0;
       color: var(--muted);
-      font-size: 14px;
-      line-height: 1.42;
+      font-size: 13px;
+      line-height: 1.38;
     }
 
     .status-control {
@@ -337,6 +337,23 @@
       font-weight: 900;
     }
 
+    .launcher-help {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.42;
+    }
+
+    .launcher-help summary {
+      cursor: pointer;
+      color: var(--ink);
+      font-weight: 900;
+    }
+
+    .launcher-help p {
+      margin: 9px 0 0;
+    }
+
     .manual ol {
       margin: 12px 0 0;
       padding-left: 22px;
@@ -389,9 +406,13 @@
             <button class="platform" type="button" data-platform="windows" aria-pressed="true">Windows <span>Valgt</span></button>
             <button class="platform" type="button" data-platform="mac" aria-pressed="false">Mac <span>Skift</span></button>
           </div>
-          <a id="setupLink" class="primary-action" href="Start Windows setup.cmd">Start setup-assistent</a>
+          <a id="setupLink" class="primary-action" href="#setupLauncherHelp">Find setup-assistent</a>
           <a class="secondary-action" href="#manualGuide">Manuel vejledning</a>
           <div class="notice">Chromebook kan ikke bruges til dette GF2-flow. Windows må ikke være i S-mode, hvis programmer skal installeres.</div>
+          <details id="setupLauncherHelp" class="launcher-help">
+            <summary>Sådan starter du assistenten</summary>
+            <p id="setupLauncherText">Åbn mappen med filerne, og dobbeltklik på Start Windows setup.cmd.</p>
+          </details>
         </div>
       </aside>
 
@@ -528,6 +549,29 @@
       });
     }
 
+    function fillStudentStatus(status) {
+      const statuses = {};
+      studentSteps.forEach((_, index) => {
+        statuses[index] = status;
+      });
+      writeJson(storage.student, statuses);
+    }
+
+    function applySetupCompletionFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("setup") !== "complete") {
+        return;
+      }
+
+      fillStudentStatus("Færdig");
+      localStorage.setItem(storage.mode, "student");
+      const cleanUrl = window.location.href
+        .replace(/[?&]setup=complete\b/, "")
+        .replace("?&", "?")
+        .replace(/\?$/, "");
+      window.history.replaceState({}, document.title, cleanUrl);
+    }
+
     function setPlatform(platform) {
       localStorage.setItem(storage.platform, platform);
       document.querySelectorAll("[data-platform]").forEach(button => {
@@ -535,7 +579,10 @@
         button.setAttribute("aria-pressed", String(active));
         button.querySelector("span").textContent = active ? "Valgt" : "Skift";
       });
-      document.getElementById("setupLink").href = platform === "mac" ? "Start Mac setup.command" : "Start Windows setup.cmd";
+      document.getElementById("setupLink").href = "#setupLauncherHelp";
+      document.getElementById("setupLauncherText").textContent = platform === "mac"
+        ? "Åbn mappen med filerne, og dobbeltklik på Start Mac setup.command."
+        : "Åbn mappen med filerne, og dobbeltklik på Start Windows setup.cmd.";
     }
 
     function setMode(mode) {
@@ -554,6 +601,7 @@
     document.getElementById("studentMode").addEventListener("click", () => setMode("student"));
     document.getElementById("teacherMode").addEventListener("click", () => setMode("teacher"));
 
+    applySetupCompletionFromUrl();
     renderLinks();
     renderSteps("studentSteps", studentSteps, storage.student);
     renderSteps("teacherSteps", teacherSteps, storage.teacher);
