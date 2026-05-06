@@ -33,6 +33,10 @@
       color: inherit;
     }
 
+    button {
+      font: inherit;
+    }
+
     .page {
       min-height: 100vh;
       display: grid;
@@ -157,12 +161,14 @@
       justify-content: center;
       min-height: 54px;
       padding: 0 24px;
+      border: 0;
       border-radius: 6px;
       background: var(--blue);
       color: #fff;
       font-weight: 900;
       text-decoration: none;
       box-shadow: 0 14px 28px rgba(0, 90, 167, .22);
+      cursor: pointer;
     }
 
     .primary:hover {
@@ -264,6 +270,84 @@
       text-decoration: underline;
     }
 
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(23, 32, 42, .52);
+      z-index: 20;
+    }
+
+    .modal-backdrop.is-open {
+      display: flex;
+    }
+
+    .download-modal {
+      position: relative;
+      width: min(420px, 100%);
+      padding: 28px;
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: 0 26px 70px rgba(23, 32, 42, .30);
+    }
+
+    .download-modal h2 {
+      margin: 0 0 20px;
+      font-size: 1.45rem;
+      line-height: 1.15;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .platform-choice {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .platform-download {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 58px;
+      border: 0;
+      border-radius: 6px;
+      background: var(--blue);
+      color: #fff;
+      font: inherit;
+      font-weight: 900;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .platform-download:hover {
+      background: var(--blue-dark);
+    }
+
+    .platform-download:disabled {
+      background: #d7e0e5;
+      color: #77838d;
+      cursor: not-allowed;
+    }
+
     @media (max-width: 820px) {
       .topbar {
         align-items: flex-start;
@@ -321,7 +405,7 @@
         </p>
 
         <div class="actions" aria-label="Primære handlinger">
-          <a class="primary" href="dist/GF2-IT-Setup-Windows.zip" download>Download Windows Setup</a>
+          <button class="primary" type="button" onclick="openDownloadModal()">Download setup</button>
           <a class="secondary" href="start.html">Åbn dashboard</a>
         </div>
 
@@ -351,5 +435,42 @@
       <a href="https://github.com/Tech-Pleex/Startup-project-2026">GitHub</a>
     </footer>
   </div>
+
+  <div id="downloadModal" class="modal-backdrop" role="presentation" aria-hidden="true" onclick="handleModalBackdropClick(event)">
+    <section class="download-modal" role="dialog" aria-modal="true" aria-labelledby="downloadModalTitle">
+      <button class="modal-close" type="button" aria-label="Luk" onclick="closeDownloadModal()">×</button>
+      <h2 id="downloadModalTitle">Vælg computer</h2>
+      <div class="platform-choice">
+        <a class="platform-download" href="dist/GF2-IT-Setup-Windows.zip" download>Windows</a>
+        <button class="platform-download" type="button" disabled>Mac</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const downloadModal = document.getElementById("downloadModal");
+
+    function openDownloadModal() {
+      downloadModal.classList.add("is-open");
+      downloadModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeDownloadModal() {
+      downloadModal.classList.remove("is-open");
+      downloadModal.setAttribute("aria-hidden", "true");
+    }
+
+    function handleModalBackdropClick(event) {
+      if (event.target === downloadModal) {
+        closeDownloadModal();
+      }
+    }
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") {
+        closeDownloadModal();
+      }
+    });
+  </script>
 </body>
 </html>
