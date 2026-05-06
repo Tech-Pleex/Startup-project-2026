@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GF2 IT Setup</title>
+  <style>
+    :root {
+      --ink: #17202a;
+      --muted: #5f6b76;
+      --paper: #f3f7f8;
+      --surface: #ffffff;
+      --line: #d8e2e7;
+      --blue: #005aa7;
+      --blue-dark: #003f73;
+      --green: #237a4b;
+      --amber: #efb43f;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      letter-spacing: 0;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 18px clamp(18px, 4vw, 48px);
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+      font-weight: 900;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 52px;
+      height: 52px;
+      border-radius: 4px;
+      background: var(--blue);
+      color: #fff;
+      flex: 0 0 auto;
+      font-size: 1.1rem;
+      letter-spacing: 0;
+    }
+
+    .brand span {
+      display: block;
+      font-size: clamp(1rem, 2.2vw, 1.2rem);
+      line-height: 1.1;
+    }
+
+    .brand small {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .top-link {
+      color: var(--blue-dark);
+      font-weight: 800;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .top-link:hover {
+      text-decoration: underline;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.02fr) minmax(320px, .98fr);
+      gap: clamp(26px, 5vw, 64px);
+      align-items: center;
+      width: min(1160px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: clamp(34px, 7vw, 78px) 0;
+    }
+
+    .copy {
+      max-width: 620px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 18px;
+      color: var(--blue-dark);
+      font-size: .92rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 28px;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--amber);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.45rem, 6vw, 5.35rem);
+      line-height: .96;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      margin: 22px 0 0;
+      color: #33404b;
+      font-size: 1rem;
+      line-height: 1.45;
+      max-width: 54ch;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      margin-top: 30px;
+    }
+
+    .primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 54px;
+      padding: 0 24px;
+      border: 0;
+      border-radius: 6px;
+      background: var(--blue);
+      color: #fff;
+      font-weight: 900;
+      text-decoration: none;
+      box-shadow: 0 14px 28px rgba(0, 90, 167, .22);
+      cursor: pointer;
+    }
+
+    .primary:hover {
+      background: var(--blue-dark);
+    }
+
+    .secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 54px;
+      padding: 0 18px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--blue-dark);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .secondary:hover {
+      border-color: var(--blue);
+    }
+
+    .safety {
+      margin-top: 28px;
+      padding: 16px 18px;
+      border-left: 5px solid var(--green);
+      background: var(--surface);
+      color: #26323b;
+      line-height: 1.45;
+      box-shadow: 0 12px 28px rgba(23, 32, 42, .08);
+    }
+
+    .safety strong {
+      color: var(--green);
+    }
+
+    .hero-media {
+      position: relative;
+      min-height: 410px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #dfe9ee;
+      box-shadow: 0 24px 52px rgba(23, 32, 42, .22);
+    }
+
+    .hero-media img {
+      width: 100%;
+      height: 100%;
+      min-height: 410px;
+      display: block;
+      object-fit: cover;
+    }
+
+    .quick-steps {
+      position: absolute;
+      left: 20px;
+      bottom: 20px;
+      display: grid;
+      gap: 10px;
+      padding: 16px;
+      max-width: min(440px, calc(100% - 40px));
+      border-radius: 6px;
+      background: rgba(255, 255, 255, .90);
+      color: #1e2a33;
+      box-shadow: 0 12px 30px rgba(23, 32, 42, .18);
+    }
+
+    .quick-steps p {
+      margin: 0;
+      font-weight: 900;
+    }
+
+    .quick-steps ol {
+      margin: 0;
+      padding-left: 20px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    footer {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      padding: 24px 18px 34px;
+      color: var(--muted);
+      font-size: .95rem;
+    }
+
+    footer a {
+      color: var(--blue-dark);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(23, 32, 42, .52);
+      z-index: 20;
+    }
+
+    .modal-backdrop.is-open {
+      display: flex;
+    }
+
+    .download-modal {
+      position: relative;
+      width: min(420px, 100%);
+      padding: 28px;
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: 0 26px 70px rgba(23, 32, 42, .30);
+    }
+
+    .download-modal h2 {
+      margin: 0 0 20px;
+      font-size: 1.45rem;
+      line-height: 1.15;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .platform-choice {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .platform-download {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 58px;
+      border: 0;
+      border-radius: 6px;
+      background: var(--blue);
+      color: #fff;
+      font: inherit;
+      font-weight: 900;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .platform-download:hover {
+      background: var(--blue-dark);
+    }
+
+    .platform-download:disabled {
+      background: #d7e0e5;
+      color: #77838d;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 820px) {
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: 30px;
+      }
+
+      .hero-media,
+      .hero-media img {
+        min-height: 310px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .actions a {
+        width: 100%;
+      }
+
+      .quick-steps {
+        position: static;
+        border-radius: 0;
+      }
+
+      .hero-media {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar" aria-label="Sidehoved">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">GF2</div>
+        <div>
+          <span>GF2 IT Setup</span>
+          <small>Nem opstart til Windows, skolemail og hverdagens it.</small>
+        </div>
+      </div>
+      <a class="top-link" href="https://github.com/Tech-Pleex/Startup-project-2026">GitHub</a>
+    </header>
+
+    <main class="hero">
+      <section class="copy" aria-labelledby="page-title">
+        <p class="eyebrow">NEG opstart</p>
+        <h1 id="page-title">GF2 IT Setup</h1>
+        <p class="lead">
+          Download Windows-pakken, pak den ud, og start guiden. Den hjælper dig med de vigtigste programmer,
+          links og kontroller, så du er klar til undervisningen.
+        </p>
+
+        <div class="actions" aria-label="Primære handlinger">
+          <button class="primary" type="button" onclick="openDownloadModal()">Download setup</button>
+          <a class="secondary" href="start.html">Åbn dashboard</a>
+        </div>
+
+        <p class="safety">
+          <strong>Vi beder aldrig om adgangskoder</strong> til MitID/UNI-Login eller andre konti. Log kun ind
+          på officielle sider, når du selv har åbnet dem.
+        </p>
+      </section>
+
+      <aside class="hero-media" aria-label="GF2 IT Setup illustration">
+        <img src="assets/neg-hero-transition.png" alt="GF2 IT Setup på en bærbar computer">
+        <div class="quick-steps" aria-label="Sådan kommer du i gang">
+          <p>Kom i gang på tre minutter</p>
+          <ol>
+            <li>Download Windows Setup.</li>
+            <li>Pak filen ud på computeren.</li>
+            <li>Kør Start Windows setup.</li>
+          </ol>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      <span>Har du brug for hjælp, så spørg din lærer eller skolens it.</span>
+      <span>Udviklet af Jesper Reenberg</span>
+      <a href="start.html">Dashboard</a>
+      <a href="https://github.com/Tech-Pleex/Startup-project-2026">GitHub</a>
+    </footer>
+  </div>
+
+  <div id="downloadModal" class="modal-backdrop" role="presentation" aria-hidden="true" onclick="handleModalBackdropClick(event)">
+    <section class="download-modal" role="dialog" aria-modal="true" aria-labelledby="downloadModalTitle">
+      <button class="modal-close" type="button" aria-label="Luk" onclick="closeDownloadModal()">×</button>
+      <h2 id="downloadModalTitle">Vælg computer</h2>
+      <div class="platform-choice">
+        <a class="platform-download" href="dist/GF2-IT-Setup-Windows.zip" download>Windows</a>
+        <button class="platform-download" type="button" disabled>Mac</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const downloadModal = document.getElementById("downloadModal");
+
+    function openDownloadModal() {
+      downloadModal.classList.add("is-open");
+      downloadModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeDownloadModal() {
+      downloadModal.classList.remove("is-open");
+      downloadModal.setAttribute("aria-hidden", "true");
+    }
+
+    function handleModalBackdropClick(event) {
+      if (event.target === downloadModal) {
+        closeDownloadModal();
+      }
+    }
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") {
+        closeDownloadModal();
+      }
+    });
+  </script>
+</body>
+</html>

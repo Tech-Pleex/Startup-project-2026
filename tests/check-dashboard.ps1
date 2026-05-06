@@ -5,6 +5,8 @@ $GitAttributes = Join-Path $Root ".gitattributes"
 $StartHtml = Join-Path $Root "start.html"
 $HeroImage = Join-Path $Root "assets\neg-hero-transition.png"
 $WindowsSetup = Join-Path $Root "scripts\setup-windows.ps1"
+$SetupConfig = Join-Path $Root "scripts\setup-config.ps1"
+$SetupChecks = Join-Path $Root "scripts\setup-checks.ps1"
 $WindowsLauncher = Join-Path $Root "Start Windows setup.cmd"
 $MacSetup = Join-Path $Root "scripts\setup-mac.sh"
 $MacLauncher = Join-Path $Root "Start Mac setup.command"
@@ -63,6 +65,8 @@ Assert-File $GitAttributes
 Assert-File $StartHtml
 Assert-File $HeroImage
 Assert-File $WindowsSetup
+Assert-File $SetupConfig
+Assert-File $SetupChecks
 Assert-File $WindowsLauncher
 Assert-File $MacSetup
 Assert-File $MacLauncher
@@ -71,6 +75,7 @@ Assert-File $BuildPackage
 $GitAttributesContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $GitAttributes
 $Html = Get-Content -Raw -Encoding UTF8 -LiteralPath $StartHtml
 $WindowsSetupContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $WindowsSetup
+$SetupConfigContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $SetupConfig
 $WindowsLauncherContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $WindowsLauncher
 $MacSetupContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $MacSetup
 $MacLauncherContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $MacLauncher
@@ -86,6 +91,21 @@ Assert-Contains $Html "I gang" "status label"
 Assert-Contains $Html "Færdig" "status label"
 Assert-Contains $Html "gf2-it-dashboard.studentStatus" "student localStorage key"
 Assert-Contains $Html "gf2-it-dashboard.teacherStatus" "teacher localStorage key"
+Assert-Contains $Html "setup=complete" "setup completion URL signal"
+Assert-Contains $Html "applySetupCompletionFromUrl" "setup completion handler"
+Assert-Contains $Html 'fillStudentStatus("Færdig")' "setup completion marks student status done"
+Assert-Contains $Html ".step p {" "dashboard step body style"
+Assert-Contains $Html "font-size: 13px;" "smaller dashboard step body text"
+Assert-Contains $Html "Download setup" "dashboard download page link"
+Assert-Contains $Html 'href="index.html"' "dashboard links back to landing page"
+Assert-NotContains $Html "Vælg computer" "dashboard platform chooser removed"
+Assert-NotContains $Html 'data-platform="windows"' "Windows platform button removed"
+Assert-NotContains $Html 'data-platform="mac"' "Mac platform button removed"
+Assert-NotContains $Html "gf2-it-dashboard.platform" "platform localStorage key removed"
+Assert-NotContains $Html "function setPlatform" "platform JavaScript removed"
+Assert-NotContains $Html "setupLauncherHelp" "dashboard launcher help removed"
+Assert-NotContains $Html 'href="Start Windows setup.cmd"' "browser must not link directly to Windows CMD"
+Assert-NotContains $Html 'href="Start Mac setup.command"' "browser must not link directly to Mac command"
 Assert-Contains $Html "Office 365 / skolemail" "fixed link"
 Assert-Contains $Html "Moodle" "fixed link"
 Assert-Contains $Html "Lectio" "fixed link"
@@ -94,22 +114,32 @@ Assert-Contains $Html "OneDrive" "fixed link"
 Assert-Contains $Html "SketchUp / Trimble" "fixed link"
 Assert-Contains $Html "NEG hjemmeside" "fixed link"
 Assert-Contains $Html "+45 72 290 100" "absence phone"
+Assert-Contains $Html "Udviklet af Jesper Reenberg" "developer credit"
 
 foreach ($ExpectedLink in @(
     "https://online.neg.dk/login/index.php",
     "https://www.lectio.dk/lectio/769/default.aspx",
-    "https://authentication.praxis.dk/Account/Login?ReturnUrl=",
-    "https://id.trimble.com/ui/sign_in.html?state="
+    "https://online.praxis.dk/",
+    "https://sketchup.trimble.com/"
 )) {
     Assert-Contains $Html $ExpectedLink "correct service URL"
-    Assert-Contains $WindowsSetupContent $ExpectedLink "correct Windows setup URL"
     Assert-Contains $MacSetupContent $ExpectedLink "correct Mac setup URL"
 }
 
-Assert-Contains $WindowsSetupContent "Assistenten gemmer ingen brugernavne" "credential safety"
-Assert-Contains $WindowsSetupContent "GF2 IT Dashboard.url" "desktop shortcut"
+foreach ($ExpectedLink in @(
+    "https://online.neg.dk/login/index.php",
+    "https://www.lectio.dk/lectio/769/default.aspx",
+    "https://online.praxis.dk/",
+    "https://sketchup.trimble.com/"
+)) {
+    Assert-Contains $SetupConfigContent $ExpectedLink "correct Windows setup URL"
+}
+
+Assert-Contains $SetupConfigContent "GF2 IT Dashboard.url" "desktop shortcut"
 Assert-Contains $WindowsSetupContent "[Console]::OutputEncoding" "PowerShell UTF-8 output"
-Assert-Contains $WindowsSetupContent "Read-Host `"Åbn" "asks before opening links"
+Assert-Contains $WindowsSetupContent "System.Windows.Forms" "Windows setup GUI"
+Assert-Contains $WindowsSetupContent "Assistenten beder aldrig om adgangskoder" "Windows setup safety"
+Assert-Contains $WindowsSetupContent "setup=complete" "Windows wizard opens dashboard with completion signal"
 Assert-Contains $WindowsLauncherContent "chcp 65001" "Windows launcher UTF-8 codepage"
 Assert-Contains $WindowsLauncherContent "scripts\setup-windows.ps1" "Windows launcher target"
 Assert-Contains $MacSetupContent "GF2 IT setup-assistent til Mac" "Mac setup heading"
@@ -122,6 +152,8 @@ Assert-Contains $GitAttributesContent "*.command text eol=lf" "Mac launcher LF e
 
 Assert-NotContains $Html "url(`"http" "remote CSS image"
 Assert-NotContains $Html "src=`"http" "remote image/script source"
+Assert-NotContains $Html "ReturnUrl=" "sessionful Praxis URL"
+Assert-NotContains $Html "id.trimble.com/ui/sign_in.html?state=" "sessionful Trimble URL"
 Assert-NotContains $Html "password" "credential wording"
 Assert-NotContains $Html "adgangskode gemmes" "stored password wording"
 
