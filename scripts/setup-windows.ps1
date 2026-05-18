@@ -59,7 +59,7 @@ function Get-WifiStatusText {
     return "Wi-Fi: Aktivt netværk er $ssid. Målet er $($SetupConfig.TargetWifi)."
 }
 
-function Render-Step {
+function Show-Step {
     $step = $SetupSteps[$CurrentStepIndex]
     $Form.Text = $SetupConfig.Title
     $ProgressLabel.Text = Get-StepProgressText
@@ -177,7 +177,7 @@ function Move-NextStep {
     }
 
     $script:CurrentStepIndex += 1
-    Render-Step
+    Show-Step
 }
 
 function Move-PreviousStep {
@@ -186,7 +186,7 @@ function Move-PreviousStep {
     }
 
     $script:CurrentStepIndex -= 1
-    Render-Step
+    Show-Step
 }
 
 $Form = New-Object System.Windows.Forms.Form
@@ -280,7 +280,7 @@ $NextButton.UseVisualStyleBackColor = $true
 $NextButton.Add_Click({ Move-NextStep })
 $ButtonPanel.Controls.Add($NextButton)
 
-Render-Step
+Show-Step
 [System.Windows.Forms.Application]::Run($Form)
 
 
