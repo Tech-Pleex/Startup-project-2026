@@ -15,7 +15,7 @@ Projektet består af:
 Brug disse termer konsekvent. Undgå synonymer der ikke er listet her.
 
 - **GF2** — Grundforløb 2. Den del af en erhvervsuddannelse hvor eleverne specialiserer sig. Projektets målgruppe.
-- **NEG** — Nordjyllands Erhvervs Gymnasium. Skolen der bruger dette værktøj.
+- **NEG** — Nordsjællands Erhvervs Gymnasium. Skolen der bruger dette værktøj.
 - **Elev** — en GF2-studerende. Projektets primære bruger. Brug ikke "bruger" eller "user" i eleven's kontekst.
 - **Underviser** — en lærer på NEG der hjælper elever med opsætning. Sekundær bruger af dashboardet.
 - **NEG-login** — skolens brugernavn + adgangskode (ikke MitID). Bruges til Wi-Fi, Office 365, Moodle.
