@@ -34,6 +34,7 @@ func New(osImpl osops.OS) *Server {
 	s.mux.HandleFunc("POST /api/steps/{id}/open", s.handleOpen)
 	s.mux.HandleFunc("GET /api/wifi", s.handleWifi)
 	s.mux.HandleFunc("POST /api/wifi/settings", s.handleWifiSettings)
+	s.mux.HandleFunc("POST /api/sketchup/install", s.handleSketchUp)
 	return s
 }
 
@@ -104,4 +105,15 @@ func (s *Server) handleOpen(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
+}
+
+// handleSketchUp kører installationsflowet. Fallback er et forventet
+// udfald (S-mode, manglende winget, fejlet installation) — ikke en
+// serverfejl — så svaret er altid 200 med action og evt. begrundelse.
+func (s *Server) handleSketchUp(w http.ResponseWriter, r *http.Request) {
+	outcome := s.wiz.InstallSketchUp()
+	writeJSON(w, map[string]string{
+		"action": string(outcome.Action),
+		"reason": outcome.Reason,
+	})
 }

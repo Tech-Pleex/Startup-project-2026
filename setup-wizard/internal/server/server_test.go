@@ -228,3 +228,39 @@ func TestOpenURLLessStepReturnsJSONError(t *testing.T) {
 		t.Errorf("fejlsvaret mangler en error-besked")
 	}
 }
+
+func TestSketchUpInstallReportsOutcome(t *testing.T) {
+	cases := []struct {
+		name       string
+		fake       *osfake.Fake
+		wantAction string
+		wantReason bool
+	}{
+		{"winget virker", &osfake.Fake{WingetOK: true}, "installed", false},
+		{"S-mode", &osfake.Fake{WingetOK: true, InSMode: true}, "fallback", true},
+		{"winget mangler", &osfake.Fake{}, "fallback", true},
+		{"winget fejler", &osfake.Fake{WingetOK: true, InstallErr: errors.New("fejlkode 1")}, "fallback", true},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			srv := New(tc.fake)
+			rec := do(t, srv, http.MethodPost, "/api/sketchup/install")
+			if rec.Code != http.StatusOK {
+				t.Fatalf("status = %d, forventede 200", rec.Code)
+			}
+			var resp struct {
+				Action string `json:"action"`
+				Reason string `json:"reason"`
+			}
+			if err := json.Unmarshal(rec.Body.Bytes(), &resp); err != nil {
+				t.Fatalf("ugyldig JSON: %v", err)
+			}
+			if resp.Action != tc.wantAction {
+				t.Errorf("action = %q, forventede %q", resp.Action, tc.wantAction)
+			}
+			if tc.wantReason && resp.Reason == "" {
+				t.Errorf("fallback uden elevvendt begrundelse")
+			}
+		})
+	}
+}
