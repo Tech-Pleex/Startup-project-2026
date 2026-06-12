@@ -3,10 +3,12 @@ package wizard
 import (
 	"errors"
 	"testing"
+
+	"github.com/Tech-Pleex/Startup-project-2026/setup-wizard/internal/osops/osfake"
 )
 
 func TestWifiStatusOnTargetNetwork(t *testing.T) {
-	w := New(&fakeOS{ssid: "NEG"})
+	w := New(&osfake.Fake{SSID: "NEG"})
 
 	status, err := w.WifiStatus()
 	if err != nil {
@@ -21,7 +23,7 @@ func TestWifiStatusOnTargetNetwork(t *testing.T) {
 }
 
 func TestWifiStatusOnGuestNetwork(t *testing.T) {
-	w := New(&fakeOS{ssid: "NEG Guest"})
+	w := New(&osfake.Fake{SSID: "NEG Guest"})
 
 	status, err := w.WifiStatus()
 	if err != nil {
@@ -33,7 +35,7 @@ func TestWifiStatusOnGuestNetwork(t *testing.T) {
 }
 
 func TestWifiStatusOnUnknownNetwork(t *testing.T) {
-	w := New(&fakeOS{ssid: "Naboens Netværk"})
+	w := New(&osfake.Fake{SSID: "Naboens Netværk"})
 
 	status, err := w.WifiStatus()
 	if err != nil {
@@ -48,7 +50,7 @@ func TestWifiStatusOnUnknownNetwork(t *testing.T) {
 }
 
 func TestWifiStatusWithNoNetwork(t *testing.T) {
-	w := New(&fakeOS{ssid: ""})
+	w := New(&osfake.Fake{SSID: ""})
 
 	status, err := w.WifiStatus()
 	if err != nil {
@@ -61,7 +63,7 @@ func TestWifiStatusWithNoNetwork(t *testing.T) {
 
 func TestWifiStatusPropagatesOSError(t *testing.T) {
 	osErr := errors.New("netsh fejlede")
-	w := New(&fakeOS{ssidErr: osErr})
+	w := New(&osfake.Fake{SSIDErr: osErr})
 
 	_, err := w.WifiStatus()
 	if !errors.Is(err, osErr) {
@@ -70,13 +72,13 @@ func TestWifiStatusPropagatesOSError(t *testing.T) {
 }
 
 func TestOpenWifiSettingsDelegatesToOS(t *testing.T) {
-	fake := &fakeOS{}
+	fake := &osfake.Fake{}
 	w := New(fake)
 
 	if err := w.OpenWifiSettings(); err != nil {
 		t.Fatalf("uventet fejl: %v", err)
 	}
-	if fake.openedWifiSettings != 1 {
-		t.Errorf("Wi-Fi-indstillinger åbnet %d gange, forventede 1", fake.openedWifiSettings)
+	if fake.WifiSettingsOpens != 1 {
+		t.Errorf("Wi-Fi-indstillinger åbnet %d gange, forventede 1", fake.WifiSettingsOpens)
 	}
 }
