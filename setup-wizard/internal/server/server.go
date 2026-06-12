@@ -30,6 +30,8 @@ func New(osImpl osops.OS) *Server {
 	s.mux.HandleFunc("GET /api/steps", s.handleSteps)
 	s.mux.HandleFunc("POST /api/steps/{id}/done", s.handleSetDone(true))
 	s.mux.HandleFunc("POST /api/steps/{id}/undo", s.handleSetDone(false))
+	s.mux.HandleFunc("GET /api/wifi", s.handleWifi)
+	s.mux.HandleFunc("POST /api/wifi/settings", s.handleWifiSettings)
 	return s
 }
 
@@ -55,5 +57,30 @@ func (s *Server) handleSetDone(done bool) http.HandlerFunc {
 			return
 		}
 		w.WriteHeader(http.StatusNoContent)
+	}
+}
+
+func (s *Server) handleWifi(w http.ResponseWriter, r *http.Request) {
+	status, err := s.wiz.WifiStatus()
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	writeJSON(w, map[string]string{"ssid": status.SSID, "state": string(status.State)})
+}
+
+func (s *Server) handleWifiSettings(w http.ResponseWriter, r *http.Request) {
+	if err := s.wiz.OpenWifiSettings(); err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func writeError(w http.ResponseWriter, code int, err error) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(code)
+	if encErr := json.NewEncoder(w).Encode(map[string]string{"error": err.Error()}); encErr != nil {
+		log.Printf("kunne ikke skrive JSON-fejlsvar: %v", encErr)
 	}
 }

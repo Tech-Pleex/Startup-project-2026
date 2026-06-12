@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -105,5 +106,53 @@ func TestMarkUnknownStepReturnsNotFound(t *testing.T) {
 		if rec := do(t, srv, http.MethodPost, path); rec.Code != http.StatusNotFound {
 			t.Errorf("%s: status = %d, forventede 404", path, rec.Code)
 		}
+	}
+}
+
+func TestWifiStatusClassifiesNetworks(t *testing.T) {
+	cases := []struct {
+		name, ssid, wantState string
+	}{
+		{"på NEG", "NEG", "target"},
+		{"på NEG Guest", "NEG Guest", "guest"},
+		{"ukendt netværk", "Naboens Netværk", "other"},
+		{"intet netværk", "", "none"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			srv := New(&osfake.Fake{SSID: tc.ssid})
+			rec := do(t, srv, http.MethodGet, "/api/wifi")
+			if rec.Code != http.StatusOK {
+				t.Fatalf("status = %d, forventede 200", rec.Code)
+			}
+			var resp struct {
+				SSID  string `json:"ssid"`
+				State string `json:"state"`
+			}
+			if err := json.Unmarshal(rec.Body.Bytes(), &resp); err != nil {
+				t.Fatalf("ugyldig JSON: %v", err)
+			}
+			if resp.State != tc.wantState || resp.SSID != tc.ssid {
+				t.Errorf("svar = %+v, forventede ssid=%q state=%q", resp, tc.ssid, tc.wantState)
+			}
+		})
+	}
+}
+
+func TestWifiStatusReportsOSError(t *testing.T) {
+	srv := New(&osfake.Fake{SSIDErr: errors.New("netsh fejlede")})
+	if rec := do(t, srv, http.MethodGet, "/api/wifi"); rec.Code != http.StatusInternalServerError {
+		t.Errorf("status = %d, forventede 500", rec.Code)
+	}
+}
+
+func TestOpenWifiSettings(t *testing.T) {
+	fake := &osfake.Fake{}
+	srv := New(fake)
+	if rec := do(t, srv, http.MethodPost, "/api/wifi/settings"); rec.Code != http.StatusNoContent {
+		t.Fatalf("status = %d, forventede 204", rec.Code)
+	}
+	if fake.WifiSettingsOpens != 1 {
+		t.Errorf("Wi-Fi-indstillinger åbnet %d gange, forventede 1", fake.WifiSettingsOpens)
 	}
 }
