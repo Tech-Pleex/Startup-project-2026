@@ -123,6 +123,19 @@ func TestConfigConstants(t *testing.T) {
 	}
 }
 
+func TestFinishStepOpensDashboard(t *testing.T) {
+	for _, s := range All() {
+		if s.ID != "finish" {
+			continue
+		}
+		if s.URL != URLDashboard {
+			t.Errorf("finish.URL = %q, forventede %q", s.URL, URLDashboard)
+		}
+		return
+	}
+	t.Fatal("finish-trinnet findes ikke")
+}
+
 func mustFind(t *testing.T, id string) Step {
 	t.Helper()
 	for _, step := range All() {

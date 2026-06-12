@@ -34,6 +34,7 @@ const (
 	URLOneDrive          = "https://www.office.com/launch/onedrive"
 	URLTrimbleInvitation = "https://www.office.com/"
 	URLSketchUpFallback  = "https://sketchup.trimble.com/"
+	URLDashboard         = "https://tech-pleex.github.io/Startup-project-2026/start.html"
 )
 
 // Step er ét trin i Assistentens forløb. Al tekst er elevvendt og på dansk.
@@ -125,7 +126,8 @@ func All() []Step {
 			ID:     "finish",
 			Title:  "Færdig",
 			Kind:   KindFinish,
-			Body:   "Assistenten opretter en genvej til dashboardet og åbner dashboardet.",
+			Body:   "Du er igennem alle trin. Assistenten kan åbne dashboardet med hurtige links til skolesystemerne, så du nemt finder dem igen.",
+			URL:    URLDashboard,
 			Button: "Åbn dashboard",
 		},
 	}
