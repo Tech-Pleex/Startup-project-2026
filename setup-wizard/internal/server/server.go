@@ -8,6 +8,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"sync"
 
 	"github.com/Tech-Pleex/Startup-project-2026/setup-wizard/internal/osops"
 	"github.com/Tech-Pleex/Startup-project-2026/setup-wizard/internal/steps"
@@ -17,9 +18,11 @@ import (
 // Server er Assistentens HTTP-API. Den implementerer http.Handler og
 // holder al tilstand, så main kan være tynd.
 type Server struct {
-	wiz   *wizard.Wizard
-	state *state
-	mux   *http.ServeMux
+	wiz      *wizard.Wizard
+	state    *state
+	mux      *http.ServeMux
+	quit     chan struct{}
+	quitOnce sync.Once
 }
 
 func New(osImpl osops.OS) *Server {
@@ -27,6 +30,7 @@ func New(osImpl osops.OS) *Server {
 		wiz:   wizard.New(osImpl),
 		state: newState(steps.All()),
 		mux:   http.NewServeMux(),
+		quit:  make(chan struct{}),
 	}
 	s.mux.HandleFunc("GET /api/steps", s.handleSteps)
 	s.mux.HandleFunc("POST /api/steps/{id}/done", s.handleSetDone(true))
@@ -35,6 +39,7 @@ func New(osImpl osops.OS) *Server {
 	s.mux.HandleFunc("GET /api/wifi", s.handleWifi)
 	s.mux.HandleFunc("POST /api/wifi/settings", s.handleWifiSettings)
 	s.mux.HandleFunc("POST /api/sketchup/install", s.handleSketchUp)
+	s.mux.HandleFunc("POST /api/quit", s.handleQuit)
 	return s
 }
 
@@ -116,4 +121,12 @@ func (s *Server) handleSketchUp(w http.ResponseWriter, r *http.Request) {
 		"action": string(outcome.Action),
 		"reason": outcome.Reason,
 	})
+}
+
+// Quit lukkes når eleven afslutter Assistenten; main venter på kanalen.
+func (s *Server) Quit() <-chan struct{} { return s.quit }
+
+func (s *Server) handleQuit(w http.ResponseWriter, r *http.Request) {
+	s.quitOnce.Do(func() { close(s.quit) })
+	w.WriteHeader(http.StatusNoContent)
 }

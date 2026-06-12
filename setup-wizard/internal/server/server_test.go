@@ -267,3 +267,26 @@ func TestSketchUpInstallReportsOutcome(t *testing.T) {
 		})
 	}
 }
+
+func TestQuitSignalsShutdown(t *testing.T) {
+	srv := New(&osfake.Fake{})
+	select {
+	case <-srv.Quit():
+		t.Fatal("Quit-kanalen er lukket før /api/quit er kaldt")
+	default:
+	}
+
+	if rec := do(t, srv, http.MethodPost, "/api/quit"); rec.Code != http.StatusNoContent {
+		t.Fatalf("status = %d, forventede 204", rec.Code)
+	}
+	select {
+	case <-srv.Quit():
+	default:
+		t.Error("Quit-kanalen er ikke lukket efter /api/quit")
+	}
+
+	// Endnu et kald må ikke panikke (dobbelt close).
+	if rec := do(t, srv, http.MethodPost, "/api/quit"); rec.Code != http.StatusNoContent {
+		t.Errorf("andet kald: status = %d, forventede 204", rec.Code)
+	}
+}
