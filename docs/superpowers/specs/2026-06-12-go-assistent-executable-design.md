@@ -63,7 +63,7 @@ Alle endpoints binder kun til `127.0.0.1` og svarer JSON. Routing med stdlib `ht
 
 **Dataflow:** Ensrettet. Siden henter `GET /api/steps`, tegner, og genhenter efter hver handling. Go-processen er eneste kilde til sandhed; ingen klient-side-tilstand.
 
-**Fejlhåndtering:** Ukendt trin-id → 404. SketchUp-fallback er et forventet udfald, ikke en fejl: 200 med `{"outcome": "fallback", "reason": ...}`.
+**Fejlhåndtering:** Ukendt trin-id → 404. SketchUp-fallback er et forventet udfald, ikke en fejl: 200 med `{"action": "fallback", "reason": ...}`.
 
 ## Tringuide-siden
 

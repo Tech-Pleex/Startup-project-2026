@@ -261,6 +261,9 @@ func TestSketchUpInstallReportsOutcome(t *testing.T) {
 			if tc.wantReason && resp.Reason == "" {
 				t.Errorf("fallback uden elevvendt begrundelse")
 			}
+			if !tc.wantReason && resp.Reason != "" {
+				t.Errorf("reason = %q ved vellykket installation, forventede tom streng", resp.Reason)
+			}
 		})
 	}
 }
