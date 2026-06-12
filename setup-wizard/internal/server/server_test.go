@@ -80,3 +80,30 @@ func TestStepsReturnsAllTenInOrder(t *testing.T) {
 		}
 	}
 }
+
+func TestMarkStepDoneAndUndo(t *testing.T) {
+	srv := New(&osfake.Fake{})
+
+	if rec := do(t, srv, http.MethodPost, "/api/steps/wifi/done"); rec.Code != http.StatusNoContent {
+		t.Fatalf("done: status = %d, forventede 204", rec.Code)
+	}
+	if !findStep(t, getSteps(t, srv), "wifi").Done {
+		t.Errorf("wifi-trinnet er ikke markeret færdigt efter done")
+	}
+
+	if rec := do(t, srv, http.MethodPost, "/api/steps/wifi/undo"); rec.Code != http.StatusNoContent {
+		t.Fatalf("undo: status = %d, forventede 204", rec.Code)
+	}
+	if findStep(t, getSteps(t, srv), "wifi").Done {
+		t.Errorf("wifi-trinnet er stadig færdigt efter undo")
+	}
+}
+
+func TestMarkUnknownStepReturnsNotFound(t *testing.T) {
+	srv := New(&osfake.Fake{})
+	for _, path := range []string{"/api/steps/findes-ikke/done", "/api/steps/findes-ikke/undo"} {
+		if rec := do(t, srv, http.MethodPost, path); rec.Code != http.StatusNotFound {
+			t.Errorf("%s: status = %d, forventede 404", path, rec.Code)
+		}
+	}
+}

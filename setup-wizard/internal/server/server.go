@@ -28,6 +28,8 @@ func New(osImpl osops.OS) *Server {
 		mux:   http.NewServeMux(),
 	}
 	s.mux.HandleFunc("GET /api/steps", s.handleSteps)
+	s.mux.HandleFunc("POST /api/steps/{id}/done", s.handleSetDone(true))
+	s.mux.HandleFunc("POST /api/steps/{id}/undo", s.handleSetDone(false))
 	return s
 }
 
@@ -43,5 +45,15 @@ func writeJSON(w http.ResponseWriter, v any) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	if err := json.NewEncoder(w).Encode(v); err != nil {
 		log.Printf("kunne ikke skrive JSON-svar: %v", err)
+	}
+}
+
+func (s *Server) handleSetDone(done bool) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if !s.state.setDone(r.PathValue("id"), done) {
+			http.NotFound(w, r)
+			return
+		}
+		w.WriteHeader(http.StatusNoContent)
 	}
 }
