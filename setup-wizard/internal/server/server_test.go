@@ -141,8 +141,18 @@ func TestWifiStatusClassifiesNetworks(t *testing.T) {
 
 func TestWifiStatusReportsOSError(t *testing.T) {
 	srv := New(&osfake.Fake{SSIDErr: errors.New("netsh fejlede")})
-	if rec := do(t, srv, http.MethodGet, "/api/wifi"); rec.Code != http.StatusInternalServerError {
-		t.Errorf("status = %d, forventede 500", rec.Code)
+	rec := do(t, srv, http.MethodGet, "/api/wifi")
+	if rec.Code != http.StatusInternalServerError {
+		t.Fatalf("status = %d, forventede 500", rec.Code)
+	}
+	var resp struct {
+		Error string `json:"error"`
+	}
+	if err := json.Unmarshal(rec.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("ugyldig JSON: %v", err)
+	}
+	if resp.Error == "" {
+		t.Errorf("fejlsvaret mangler en error-besked")
 	}
 }
 
