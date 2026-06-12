@@ -5,6 +5,7 @@ package server
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/Tech-Pleex/Startup-project-2026/setup-wizard/internal/osops"
@@ -20,9 +21,9 @@ type Server struct {
 	mux   *http.ServeMux
 }
 
-func New(os osops.OS) *Server {
+func New(osImpl osops.OS) *Server {
 	s := &Server{
-		wiz:   wizard.New(os),
+		wiz:   wizard.New(osImpl),
 		state: newState(steps.All()),
 		mux:   http.NewServeMux(),
 	}
@@ -40,5 +41,7 @@ func (s *Server) handleSteps(w http.ResponseWriter, r *http.Request) {
 
 func writeJSON(w http.ResponseWriter, v any) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	_ = json.NewEncoder(w).Encode(v)
+	if err := json.NewEncoder(w).Encode(v); err != nil {
+		log.Printf("kunne ikke skrive JSON-svar: %v", err)
+	}
 }
