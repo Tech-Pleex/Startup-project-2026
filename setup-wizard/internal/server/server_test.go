@@ -166,3 +166,31 @@ func TestOpenWifiSettings(t *testing.T) {
 		t.Errorf("Wi-Fi-indstillinger åbnet %d gange, forventede 1", fake.WifiSettingsOpens)
 	}
 }
+
+func TestOpenStepOpensConfiguredURL(t *testing.T) {
+	fake := &osfake.Fake{}
+	srv := New(fake)
+
+	if rec := do(t, srv, http.MethodPost, "/api/steps/moodle/open"); rec.Code != http.StatusNoContent {
+		t.Fatalf("status = %d, forventede 204", rec.Code)
+	}
+	if len(fake.OpenedURLs) != 1 || fake.OpenedURLs[0] != steps.URLMoodle {
+		t.Errorf("åbnede URL'er = %v, forventede [%q]", fake.OpenedURLs, steps.URLMoodle)
+	}
+}
+
+func TestOpenRejectsUnknownAndURLLessSteps(t *testing.T) {
+	fake := &osfake.Fake{}
+	srv := New(fake)
+
+	if rec := do(t, srv, http.MethodPost, "/api/steps/findes-ikke/open"); rec.Code != http.StatusNotFound {
+		t.Errorf("ukendt trin: status = %d, forventede 404", rec.Code)
+	}
+	// welcome-trinnet har ingen URL i konfigurationen
+	if rec := do(t, srv, http.MethodPost, "/api/steps/welcome/open"); rec.Code != http.StatusBadRequest {
+		t.Errorf("trin uden URL: status = %d, forventede 400", rec.Code)
+	}
+	if len(fake.OpenedURLs) != 0 {
+		t.Errorf("der blev åbnet URL'er: %v", fake.OpenedURLs)
+	}
+}

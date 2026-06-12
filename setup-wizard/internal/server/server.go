@@ -30,6 +30,7 @@ func New(osImpl osops.OS) *Server {
 	s.mux.HandleFunc("GET /api/steps", s.handleSteps)
 	s.mux.HandleFunc("POST /api/steps/{id}/done", s.handleSetDone(true))
 	s.mux.HandleFunc("POST /api/steps/{id}/undo", s.handleSetDone(false))
+	s.mux.HandleFunc("POST /api/steps/{id}/open", s.handleOpen)
 	s.mux.HandleFunc("GET /api/wifi", s.handleWifi)
 	s.mux.HandleFunc("POST /api/wifi/settings", s.handleWifiSettings)
 	return s
@@ -83,4 +84,23 @@ func writeError(w http.ResponseWriter, code int, err error) {
 	if encErr := json.NewEncoder(w).Encode(map[string]string{"error": err.Error()}); encErr != nil {
 		log.Printf("kunne ikke skrive JSON-fejlsvar: %v", encErr)
 	}
+}
+
+// handleOpen åbner trinnets officielle URL. URL'en slås altid op i den
+// indlejrede trinkonfiguration, så API'et kun kan åbne de officielle sider.
+func (s *Server) handleOpen(w http.ResponseWriter, r *http.Request) {
+	step, ok := s.state.byID(r.PathValue("id"))
+	if !ok {
+		http.NotFound(w, r)
+		return
+	}
+	if step.URL == "" {
+		http.Error(w, "trinnet har ingen tilknyttet side", http.StatusBadRequest)
+		return
+	}
+	if err := s.wiz.OpenURL(step.URL); err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }
