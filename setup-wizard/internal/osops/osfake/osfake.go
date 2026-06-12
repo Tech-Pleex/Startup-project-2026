@@ -12,6 +12,7 @@ type Fake struct {
 	InSMode    bool
 	WingetOK   bool
 	InstallErr error
+	OpenURLErr error
 
 	OpenedURLs        []string
 	WifiSettingsOpens int
@@ -29,7 +30,7 @@ func (f *Fake) OpenWifiSettings() error {
 
 func (f *Fake) OpenURL(url string) error {
 	f.OpenedURLs = append(f.OpenedURLs, url)
-	return nil
+	return f.OpenURLErr
 }
 
 func (f *Fake) SMode() (bool, error) { return f.InSMode, nil }

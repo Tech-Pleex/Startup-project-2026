@@ -5,6 +5,7 @@ package server
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 
@@ -95,7 +96,7 @@ func (s *Server) handleOpen(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if step.URL == "" {
-		http.Error(w, "trinnet har ingen tilknyttet side", http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, errors.New("trinnet har ingen tilknyttet side"))
 		return
 	}
 	if err := s.wiz.OpenURL(step.URL); err != nil {

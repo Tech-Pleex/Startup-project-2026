@@ -194,3 +194,37 @@ func TestOpenRejectsUnknownAndURLLessSteps(t *testing.T) {
 		t.Errorf("der blev åbnet URL'er: %v", fake.OpenedURLs)
 	}
 }
+
+func TestOpenStepReportsOSError(t *testing.T) {
+	srv := New(&osfake.Fake{OpenURLErr: errors.New("ingen browser fundet")})
+	rec := do(t, srv, http.MethodPost, "/api/steps/moodle/open")
+	if rec.Code != http.StatusInternalServerError {
+		t.Fatalf("status = %d, forventede 500", rec.Code)
+	}
+	var resp struct {
+		Error string `json:"error"`
+	}
+	if err := json.Unmarshal(rec.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("ugyldig JSON: %v", err)
+	}
+	if resp.Error == "" {
+		t.Errorf("fejlsvaret mangler en error-besked")
+	}
+}
+
+func TestOpenURLLessStepReturnsJSONError(t *testing.T) {
+	srv := New(&osfake.Fake{})
+	rec := do(t, srv, http.MethodPost, "/api/steps/welcome/open")
+	if rec.Code != http.StatusBadRequest {
+		t.Fatalf("status = %d, forventede 400", rec.Code)
+	}
+	var resp struct {
+		Error string `json:"error"`
+	}
+	if err := json.Unmarshal(rec.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("ugyldig JSON: %v", err)
+	}
+	if resp.Error == "" {
+		t.Errorf("fejlsvaret mangler en error-besked")
+	}
+}
