@@ -12,6 +12,7 @@ import (
 
 	"github.com/Tech-Pleex/Startup-project-2026/setup-wizard/internal/osops"
 	"github.com/Tech-Pleex/Startup-project-2026/setup-wizard/internal/steps"
+	"github.com/Tech-Pleex/Startup-project-2026/setup-wizard/internal/web"
 	"github.com/Tech-Pleex/Startup-project-2026/setup-wizard/internal/wizard"
 )
 
@@ -40,6 +41,8 @@ func New(osImpl osops.OS) *Server {
 	s.mux.HandleFunc("POST /api/wifi/settings", s.handleWifiSettings)
 	s.mux.HandleFunc("POST /api/sketchup/install", s.handleSketchUp)
 	s.mux.HandleFunc("POST /api/quit", s.handleQuit)
+	s.mux.Handle("GET /static/", http.FileServerFS(web.Static))
+	s.mux.HandleFunc("GET /", s.handleIndex)
 	return s
 }
 
@@ -129,4 +132,12 @@ func (s *Server) Quit() <-chan struct{} { return s.quit }
 func (s *Server) handleQuit(w http.ResponseWriter, r *http.Request) {
 	s.quitOnce.Do(func() { close(s.quit) })
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
+	http.ServeFileFS(w, r, web.Static, "static/index.html")
 }

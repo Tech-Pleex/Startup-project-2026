@@ -3,12 +3,15 @@ package server
 import (
 	"encoding/json"
 	"errors"
+	"io/fs"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/Tech-Pleex/Startup-project-2026/setup-wizard/internal/osops/osfake"
 	"github.com/Tech-Pleex/Startup-project-2026/setup-wizard/internal/steps"
+	"github.com/Tech-Pleex/Startup-project-2026/setup-wizard/internal/web"
 )
 
 type stepJSON struct {
@@ -288,5 +291,48 @@ func TestQuitSignalsShutdown(t *testing.T) {
 	// Endnu et kald må ikke panikke (dobbelt close).
 	if rec := do(t, srv, http.MethodPost, "/api/quit"); rec.Code != http.StatusNoContent {
 		t.Errorf("andet kald: status = %d, forventede 204", rec.Code)
+	}
+}
+
+func TestIndexServesTringuideWithSafetyText(t *testing.T) {
+	srv := New(&osfake.Fake{})
+	rec := do(t, srv, http.MethodGet, "/")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("GET /: status = %d, forventede 200", rec.Code)
+	}
+	body := rec.Body.String()
+	if !strings.Contains(body, steps.SafetyText) {
+		t.Errorf("siden mangler sikkerhedsteksten om adgangskoder/MitID/UNI-Login")
+	}
+	if !strings.Contains(body, "Assistenten") {
+		t.Errorf("siden bruger ikke navnet Assistenten")
+	}
+}
+
+func TestStaticAssetsAreServed(t *testing.T) {
+	srv := New(&osfake.Fake{})
+	for _, path := range []string{"/static/style.css", "/static/app.js"} {
+		if rec := do(t, srv, http.MethodGet, path); rec.Code != http.StatusOK {
+			t.Errorf("GET %s: status = %d, forventede 200", path, rec.Code)
+		}
+	}
+}
+
+func TestEmbeddedAssetsContainNoInternalNames(t *testing.T) {
+	err := fs.WalkDir(web.Static, ".", func(path string, d fs.DirEntry, err error) error {
+		if err != nil || d.IsDir() {
+			return err
+		}
+		data, err := fs.ReadFile(web.Static, path)
+		if err != nil {
+			return err
+		}
+		if strings.Contains(strings.ToLower(string(data)), "setup-wizard") {
+			t.Errorf("%s indeholder det interne navn \"setup-wizard\"", path)
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("kunne ikke gennemgå indlejrede filer: %v", err)
 	}
 }
