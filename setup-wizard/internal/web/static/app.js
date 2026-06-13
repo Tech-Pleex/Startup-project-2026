@@ -1,13 +1,24 @@
 // Tringuidens klient. Al tilstand bor i Go-processen; siden henter
 // trinlisten efter hver handling og tegner forfra.
+
+// postOK sender et POST-kald og fejler hvis serveren svarer med en fejlkode,
+// så eleven aldrig efterlades i en misvisende tilstand uden besked.
+async function postOK(path) {
+  const r = await fetch(path, { method: "POST" });
+  if (!r.ok) {
+    throw new Error(`${path} svarede ${r.status}`);
+  }
+  return r;
+}
+
 const api = {
   steps: () => fetch("/api/steps").then(r => r.json()),
-  setDone: (id, done) => fetch(`/api/steps/${id}/${done ? "done" : "undo"}`, { method: "POST" }),
-  open: id => fetch(`/api/steps/${id}/open`, { method: "POST" }),
+  setDone: (id, done) => postOK(`/api/steps/${id}/${done ? "done" : "undo"}`),
+  open: id => postOK(`/api/steps/${id}/open`),
   wifi: () => fetch("/api/wifi").then(r => (r.ok ? r.json() : null)),
-  wifiSettings: () => fetch("/api/wifi/settings", { method: "POST" }),
-  sketchup: () => fetch("/api/sketchup/install", { method: "POST" }).then(r => r.json()),
-  quit: () => fetch("/api/quit", { method: "POST" }),
+  wifiSettings: () => postOK("/api/wifi/settings"),
+  sketchup: () => postOK("/api/sketchup/install").then(r => r.json()),
+  quit: () => postOK("/api/quit"),
 };
 
 let allSteps = [];
@@ -19,6 +30,10 @@ async function refresh() {
 }
 
 function render() {
+  if (allSteps.length === 0) {
+    document.getElementById("progress").textContent = "Ingen trin at vise.";
+    return;
+  }
   const step = allSteps[current];
   document.getElementById("progress").textContent = `Trin ${current + 1} af ${allSteps.length}`;
 
@@ -27,6 +42,9 @@ function render() {
   allSteps.forEach((s, i) => {
     const item = document.createElement("button");
     item.className = "step-item" + (i === current ? " active" : "");
+    if (i === current) {
+      item.setAttribute("aria-current", "step");
+    }
     item.textContent = `${i + 1}. ${s.title}` + (s.done ? " ✓" : "");
     item.addEventListener("click", () => { current = i; render(); });
     list.appendChild(item);
@@ -76,8 +94,12 @@ async function checkWifi() {
 
 document.getElementById("toggle-done").addEventListener("click", async () => {
   const step = allSteps[current];
-  await api.setDone(step.id, !step.done);
-  await refresh();
+  try {
+    await api.setDone(step.id, !step.done);
+    await refresh();
+  } catch (err) {
+    alert("Kunne ikke opdatere trinnet. Prøv igen.");
+  }
 });
 
 document.getElementById("prev").addEventListener("click", () => { current--; render(); });
@@ -89,20 +111,38 @@ document.getElementById("action").addEventListener("click", async () => {
     const result = document.getElementById("sketchup-result");
     result.hidden = false;
     result.textContent = "Installerer … det kan tage nogle minutter.";
-    const outcome = await api.sketchup();
-    result.textContent = outcome.action === "installed"
-      ? "SketchUp er installeret."
-      : outcome.reason;
+    try {
+      const outcome = await api.sketchup();
+      result.textContent = outcome.action === "installed"
+        ? "SketchUp er installeret."
+        : outcome.reason;
+    } catch (err) {
+      result.textContent = "Installationen kunne ikke startes. Åbn SketchUp-siden manuelt med knappen ovenfor.";
+    }
   } else {
-    await api.open(step.id);
+    try {
+      await api.open(step.id);
+    } catch (err) {
+      alert("Siden kunne ikke åbnes. Prøv at åbne den manuelt i din browser.");
+    }
   }
 });
 
 document.getElementById("wifi-check").addEventListener("click", checkWifi);
-document.getElementById("wifi-settings").addEventListener("click", () => api.wifiSettings());
+document.getElementById("wifi-settings").addEventListener("click", async () => {
+  try {
+    await api.wifiSettings();
+  } catch (err) {
+    alert("Wi-Fi-indstillingerne kunne ikke åbnes. Åbn dem selv via proceslinjen.");
+  }
+});
 
 document.getElementById("quit").addEventListener("click", async () => {
-  await api.quit();
+  try {
+    await api.quit();
+  } catch (err) {
+    // Assistenten er sandsynligvis allerede lukket; vis afslutningsbeskeden uanset.
+  }
   document.body.innerHTML = "<p style='padding:40px;text-align:center'>Assistenten er lukket. Du kan lukke denne fane.</p>";
 });
 
