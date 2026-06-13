@@ -1,0 +1,128 @@
+:root {
+  --ink: #181818;
+  --muted: #5c6670;
+  --line: #dce4ea;
+  --paper: #f4f7f9;
+  --surface: #ffffff;
+  --neg-blue: #005aa7;
+  --neg-blue-dark: #003f73;
+  --neg-blue-soft: #e7f2fb;
+  --amber: #efb43f;
+  --green: #237a4b;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  background: var(--neg-blue);
+  color: #fff;
+  padding: 16px 24px;
+}
+
+header h1 { margin: 0; font-size: 1.4rem; }
+
+#progress { margin: 4px 0 0; color: var(--neg-blue-soft); }
+
+main {
+  flex: 1;
+  display: flex;
+  gap: 24px;
+  padding: 24px;
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+#step-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 260px;
+  flex-shrink: 0;
+}
+
+.step-item {
+  text-align: left;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.95rem;
+}
+
+.step-item.active {
+  border-color: var(--neg-blue);
+  background: var(--neg-blue-soft);
+  font-weight: bold;
+}
+
+#step-detail {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.warning {
+  background: #fdf3df;
+  border: 1px solid var(--amber);
+  border-radius: 8px;
+  padding: 12px;
+  margin: 12px 0;
+}
+
+#action, #toggle-done, #wifi-check, #wifi-settings, #quit {
+  font: inherit;
+  background: var(--neg-blue);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  margin: 8px 8px 0 0;
+  cursor: pointer;
+}
+
+#action:hover, #wifi-check:hover, #wifi-settings:hover, #quit:hover {
+  background: var(--neg-blue-dark);
+}
+
+#toggle-done { background: var(--green); }
+
+.nav-controls {
+  margin-top: 24px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.nav-controls button {
+  font: inherit;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.nav-controls button:disabled { opacity: 0.4; cursor: default; }
+
+footer {
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  padding: 12px 24px;
+  font-size: 0.85rem;
+  text-align: center;
+}

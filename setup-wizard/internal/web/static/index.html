@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GF2 IT Setup — Assistenten</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <h1>GF2 IT Setup</h1>
+    <p id="progress">Indlæser …</p>
+  </header>
+  <main>
+    <nav id="step-list" aria-label="Trinliste"></nav>
+    <section id="step-detail">
+      <h2 id="step-title"></h2>
+      <p id="step-body"></p>
+      <div id="step-warning" class="warning" hidden></div>
+      <div id="wifi-panel" hidden>
+        <p id="wifi-status">Wi-Fi-status er ikke tjekket endnu.</p>
+        <button id="wifi-check">Tjek igen</button>
+        <button id="wifi-settings">Åbn Wi-Fi-indstillinger</button>
+      </div>
+      <p id="sketchup-result" hidden></p>
+      <button id="action" hidden></button>
+      <button id="quit" hidden>Afslut Assistenten</button>
+      <div class="step-controls">
+        <button id="toggle-done"></button>
+      </div>
+      <div class="nav-controls">
+        <button id="prev">Tilbage</button>
+        <button id="next">Frem</button>
+      </div>
+    </section>
+  </main>
+  <footer>Assistenten beder aldrig om adgangskoder, MitID eller UNI-Login. Elever indtaster kun oplysninger på officielle sider og i Windows' egne indstillinger.</footer>
+  <script src="/static/app.js"></script>
+</body>
+</html>
