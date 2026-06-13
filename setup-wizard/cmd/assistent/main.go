@@ -23,7 +23,9 @@ func main() {
 	}
 
 	go func() {
-		if err := http.Serve(ln, srv); err != nil {
+		// ErrServerClosed er ikke en fejl: den ville kun opstå ved en pæn
+		// nedlukning, hvis serveren senere får tilføjet Shutdown/Close.
+		if err := http.Serve(ln, srv); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("serveren stoppede uventet: %v", err)
 		}
 	}()
