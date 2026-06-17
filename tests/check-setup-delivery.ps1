@@ -9,8 +9,10 @@ $SetupScript = Join-Path $Root "scripts\setup-windows.ps1"
 $SetupConfig = Join-Path $Root "scripts\setup-config.ps1"
 $SetupChecks = Join-Path $Root "scripts\setup-checks.ps1"
 $BuildScript = Join-Path $Root "scripts\build-package.ps1"
-$ZipPath = Join-Path $Root "dist\GF2-IT-Setup-Windows.zip"
 $StartHtml = Join-Path $Root "start.html"
+$WindowsReleaseUrl = "https://github.com/Tech-Pleex/Startup-project-2026/releases/latest/download/Assistenten-Windows.exe"
+$MacAppleSiliconReleaseUrl = "https://github.com/Tech-Pleex/Startup-project-2026/releases/latest/download/Assistenten-Mac-Apple-Silicon"
+$MacIntelReleaseUrl = "https://github.com/Tech-Pleex/Startup-project-2026/releases/latest/download/Assistenten-Mac-Intel"
 
 function Assert-File {
     param([string]$Path)
@@ -41,25 +43,6 @@ function Assert-NotContains {
     }
 }
 
-function Assert-ZipContains {
-    param(
-        [string]$Path,
-        [string]$Entry
-    )
-
-    Add-Type -AssemblyName System.IO.Compression.FileSystem
-    $Zip = [System.IO.Compression.ZipFile]::OpenRead($Path)
-    try {
-        $Entries = $Zip.Entries.FullName
-        if ($Entries -notcontains $Entry) {
-            throw "Zip is missing entry: $Entry"
-        }
-    }
-    finally {
-        $Zip.Dispose()
-    }
-}
-
 Assert-File $Readme
 Assert-File $LandingPage
 Assert-File $HeroImage
@@ -79,8 +62,9 @@ $ChecksContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $SetupChecks
 $BuildContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $BuildScript
 
 Assert-Contains $ReadmeContent "never asks for passwords, MitID, or UNI-Login" "README credential safety"
-Assert-Contains $ReadmeContent "dist/GF2-IT-Setup-Windows.zip" "README package path"
-Assert-Contains $ReadmeContent "Start Windows setup.cmd" "README launcher"
+Assert-Contains $ReadmeContent "Assistenten-Windows.exe" "README Windows release asset"
+Assert-Contains $ReadmeContent "Assistenten-Mac-Apple-Silicon" "README Apple Silicon release asset"
+Assert-Contains $ReadmeContent "Assistenten-Mac-Intel" "README Intel Mac release asset"
 
 Assert-Contains $LandingHtml "GF2 IT Setup" "landing title"
 Assert-Contains $LandingHtml "assets/neg-hero-transition.png" "landing hero asset"
@@ -88,16 +72,25 @@ Assert-Contains $LandingHtml "Download setup" "download call to action"
 Assert-Contains $LandingHtml "downloadModal" "platform modal"
 Assert-Contains $LandingHtml "Vælg computer" "platform modal title"
 Assert-Contains $LandingHtml "Windows" "Windows platform choice"
-Assert-Contains $LandingHtml "dist/GF2-IT-Setup-Windows.zip" "Windows download package path"
+Assert-Contains $LandingHtml $WindowsReleaseUrl "Windows release download URL"
 Assert-Contains $LandingHtml "Mac" "Mac platform choice"
-Assert-Contains $LandingHtml "disabled" "disabled Mac platform choice"
+Assert-Contains $LandingHtml "Vælg Mac-type" "Mac type selection title"
+Assert-Contains $LandingHtml "Vælg Apple Silicon for M1/M2/M3/M4. Vælg Intel for ældre Macs." "Mac type guidance"
+Assert-Contains $LandingHtml "Apple Silicon" "Apple Silicon platform choice"
+Assert-Contains $LandingHtml "Intel Mac" "Intel Mac platform choice"
+Assert-Contains $LandingHtml $MacAppleSiliconReleaseUrl "Apple Silicon release download URL"
+Assert-Contains $LandingHtml $MacIntelReleaseUrl "Intel Mac release download URL"
+Assert-Contains $LandingHtml "Tilbage" "Mac selection back button"
 Assert-Contains $LandingHtml "openDownloadModal" "open modal handler"
 Assert-Contains $LandingHtml "closeDownloadModal" "close modal handler"
+Assert-Contains $LandingHtml "showMacChoices" "Mac choice handler"
+Assert-Contains $LandingHtml "showPlatformChoices" "platform choice handler"
 Assert-Contains $LandingHtml "Escape" "keyboard modal close"
 Assert-Contains $LandingHtml "Vi beder aldrig om adgangskoder" "credential safety"
 Assert-Contains $LandingHtml "start.html" "dashboard entry"
 Assert-Contains $LandingHtml "GitHub" "GitHub fallback"
 Assert-Contains $LandingHtml "Udviklet af Jesper Reenberg" "developer credit"
+Assert-NotContains $LandingHtml "dist/GF2-IT-Setup-Windows.zip" "old ZIP landing download"
 
 Assert-Contains $ConfigContent "Trimble.SketchUp.2026" "SketchUp package"
 Assert-Contains $ConfigContent "PraxisOnline" "PraxisOnline service"
@@ -127,19 +120,9 @@ Assert-Contains $LauncherContent "powershell.exe" "PowerShell launcher"
 Assert-Contains $LauncherContent "setup-windows.ps1" "setup target"
 Assert-Contains $LauncherContent "chcp 65001" "UTF-8 codepage"
 
-Assert-Contains $BuildContent "GF2-IT-Setup-Windows.zip" "package name"
+Assert-Contains $BuildContent "GF2-IT-Setup-Windows.zip" "legacy package name"
 
 Assert-NotContains $LandingHtml "password" "credential wording"
 Assert-NotContains $SetupContent "Read-Host `"Åbn" "old terminal prompt"
-
-if (Test-Path -LiteralPath $ZipPath) {
-    Assert-ZipContains $ZipPath "start.html"
-    Assert-ZipContains $ZipPath "index.html"
-    Assert-ZipContains $ZipPath "assets/neg-hero-transition.png"
-    Assert-ZipContains $ZipPath "scripts/setup-windows.ps1"
-    Assert-ZipContains $ZipPath "scripts/setup-config.ps1"
-    Assert-ZipContains $ZipPath "scripts/setup-checks.ps1"
-    Assert-ZipContains $ZipPath "Start Windows setup.cmd"
-}
 
 Write-Host "Setup delivery checks passed."

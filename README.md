@@ -29,24 +29,44 @@ powershell -ExecutionPolicy Bypass -File tests/check-dashboard.ps1
 powershell -ExecutionPolicy Bypass -File tests/check-setup-delivery.ps1
 ```
 
-## Build
-
-Build the Windows delivery package with:
+Run the Go tests from the Go module:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts/build-package.ps1
+cd setup-wizard
+go test ./...
 ```
 
-The package is created at:
+## Release build
 
-```text
-dist/GF2-IT-Setup-Windows.zip
+The landing page downloads the latest approved Assistenten binaries from
+GitHub Releases. A release should only be marked as `latest` when all three
+assets are built and uploaded:
+
+- `Assistenten-Windows.exe`
+- `Assistenten-Mac-Apple-Silicon`
+- `Assistenten-Mac-Intel`
+
+Build the release binaries from `setup-wizard`:
+
+```powershell
+$env:GOOS = "windows"; $env:GOARCH = "amd64"; go build -ldflags "-H=windowsgui" -o ..\dist\Assistenten-Windows.exe .\cmd\assistent
+$env:GOOS = "darwin"; $env:GOARCH = "arm64"; go build -o ..\dist\Assistenten-Mac-Apple-Silicon .\cmd\assistent
+$env:GOOS = "darwin"; $env:GOARCH = "amd64"; go build -o ..\dist\Assistenten-Mac-Intel .\cmd\assistent
 ```
+
+Release checklist:
+
+1. Run `go test ./...` from `setup-wizard`.
+2. Build the three Assistenten binaries.
+3. Upload all three files as assets on the GitHub Release.
+4. Mark the release as latest only after all three assets are present.
+5. Run `powershell -ExecutionPolicy Bypass -File tests/check-setup-delivery.ps1`.
 
 ## Student delivery
 
-1. Build the package.
-2. Share `dist/GF2-IT-Setup-Windows.zip` with the student.
-3. Ask the student to extract the zip file to a normal folder.
-4. Ask the student to open the extracted folder.
-5. Ask the student to run `Start Windows setup.cmd`.
+1. Ask the student to open the landing page.
+2. Ask the student to choose Windows or Mac.
+3. Mac students choose Apple Silicon for M1/M2/M3/M4, or Intel for older Macs.
+4. Ask the student to open the downloaded Assistenten file.
+5. The Assistenten starts a local browser guide and never asks for passwords,
+   MitID, or UNI-Login.
