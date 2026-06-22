@@ -16,13 +16,15 @@
     <section id="step-detail">
       <h2 id="step-title"></h2>
       <p id="step-body"></p>
+      <div id="smode-warning" class="smode-warning" role="alert" hidden>
+        <h3>Windows S-mode er aktiveret</h3>
+        <p>Assistenten kan ikke fortsætte, mens computeren kører i S-mode. Kontakt din lærer eller IT, slå S-mode fra, og prøv igen.</p>
+        <button id="smode-retry">Tjek igen</button>
+      </div>
       <div id="step-warning" class="warning" hidden></div>
       <div id="wifi-panel" hidden>
-        <p id="wifi-status">Wi-Fi-status er ikke tjekket endnu.</p>
-        <button id="wifi-check">Tjek igen</button>
         <button id="wifi-settings">Åbn Wi-Fi-indstillinger</button>
       </div>
-      <p id="sketchup-result" hidden></p>
       <button id="action" hidden></button>
       <button id="quit" hidden>Afslut Assistenten</button>
       <div class="step-controls">

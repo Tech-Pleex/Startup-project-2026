@@ -37,9 +37,8 @@ func New(osImpl osops.OS) *Server {
 	s.mux.HandleFunc("POST /api/steps/{id}/done", s.handleSetDone(true))
 	s.mux.HandleFunc("POST /api/steps/{id}/undo", s.handleSetDone(false))
 	s.mux.HandleFunc("POST /api/steps/{id}/open", s.handleOpen)
-	s.mux.HandleFunc("GET /api/wifi", s.handleWifi)
+	s.mux.HandleFunc("GET /api/system", s.handleSystem)
 	s.mux.HandleFunc("POST /api/wifi/settings", s.handleWifiSettings)
-	s.mux.HandleFunc("POST /api/sketchup/install", s.handleSketchUp)
 	s.mux.HandleFunc("POST /api/quit", s.handleQuit)
 	s.mux.Handle("GET /static/", http.FileServerFS(web.Static))
 	s.mux.HandleFunc("GET /", s.handleIndex)
@@ -71,13 +70,12 @@ func (s *Server) handleSetDone(done bool) http.HandlerFunc {
 	}
 }
 
-func (s *Server) handleWifi(w http.ResponseWriter, r *http.Request) {
-	status, err := s.wiz.WifiStatus()
+func (s *Server) handleSystem(w http.ResponseWriter, r *http.Request) {
+	sMode, err := s.wiz.SMode()
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, err)
-		return
+		sMode = false
 	}
-	writeJSON(w, map[string]string{"ssid": status.SSID, "state": string(status.State)})
+	writeJSON(w, map[string]bool{"sMode": sMode})
 }
 
 func (s *Server) handleWifiSettings(w http.ResponseWriter, r *http.Request) {
@@ -113,17 +111,6 @@ func (s *Server) handleOpen(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
-}
-
-// handleSketchUp kører installationsflowet. Fallback er et forventet
-// udfald (S-mode, manglende winget, fejlet installation) — ikke en
-// serverfejl — så svaret er altid 200 med action og evt. begrundelse.
-func (s *Server) handleSketchUp(w http.ResponseWriter, r *http.Request) {
-	outcome := s.wiz.InstallSketchUp()
-	writeJSON(w, map[string]string{
-		"action": string(outcome.Action),
-		"reason": outcome.Reason,
-	})
 }
 
 // Quit lukkes når eleven afslutter Assistenten; main venter på kanalen.

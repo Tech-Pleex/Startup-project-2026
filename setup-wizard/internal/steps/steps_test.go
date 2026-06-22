@@ -56,7 +56,7 @@ func TestStepKinds(t *testing.T) {
 		"praxis":   KindLink,
 		"lectio":   KindLink,
 		"onedrive": KindLink,
-		"sketchup": KindSketchUp,
+		"sketchup": KindLink,
 		"finish":   KindFinish,
 	}
 	for _, step := range All() {
@@ -74,7 +74,7 @@ func TestLinkStepsHaveURLs(t *testing.T) {
 		"praxis":   "https://online.praxis.dk/",
 		"lectio":   "https://www.lectio.dk/lectio/769/default.aspx",
 		"onedrive": "https://www.office.com/launch/onedrive",
-		"sketchup": "https://sketchup.trimble.com/",
+		"sketchup": "https://sketchup.trimble.com/en/download/all",
 	}
 	for _, step := range All() {
 		want, ok := wantURLs[step.ID]
@@ -91,6 +91,16 @@ func TestPraxisStepWarnsAboutSchoolMail(t *testing.T) {
 	step := mustFind(t, "praxis")
 	if !strings.Contains(step.Warning, "skolemail") {
 		t.Errorf("praxis-trinnets advarsel nævner ikke skolemail: %q", step.Warning)
+	}
+}
+
+func TestWifiStepIsManualSettingsGuidance(t *testing.T) {
+	step := mustFind(t, "wifi")
+	if step.Kind != KindWifi || step.Button != "Åbn Wi-Fi-indstillinger" {
+		t.Errorf("Wi-Fi-trin = %+v", step)
+	}
+	if !strings.Contains(step.Body, "forbind") || !strings.Contains(step.Body, TargetWifi) {
+		t.Errorf("Wi-Fi-vejledningen er uklar: %q", step.Body)
 	}
 }
 
@@ -117,9 +127,6 @@ func TestConfigConstants(t *testing.T) {
 	}
 	if GuestWifi != "NEG Guest" {
 		t.Errorf("GuestWifi = %q, forventede %q", GuestWifi, "NEG Guest")
-	}
-	if SketchUpPackageID != "Trimble.SketchUp.2026" {
-		t.Errorf("SketchUpPackageID = %q, forventede %q", SketchUpPackageID, "Trimble.SketchUp.2026")
 	}
 }
 

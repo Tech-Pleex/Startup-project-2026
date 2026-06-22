@@ -4,6 +4,11 @@ Go-koden bag GF2 IT Setup-Assistenten: én kodebase, der kompileres til en
 Windows-`.exe` og en Mac-binær. Binæren starter en lokal webserver på
 localhost, åbner elevens browser og viser den danske tringuide.
 
+Assistenten kontrollerer Windows S-mode på Velkommen-steppet og blokerer
+trinforløbet, hvis S-mode er aktivt. Wi-Fi bekræftes manuelt via Windows'
+egne Wi-Fi-indstillinger. SketchUp-trinnet åbner den officielle downloadside
+og forsøger ikke automatisk installation.
+
 ## Tests
 
     go test ./...
@@ -24,6 +29,6 @@ fra enhver maskine med Go installeret.
 
     go run ./cmd/assistent
 
-Linux-implementeringen er en udviklerstub: Wi-Fi-status svarer "intet
-netværk", og SketchUp-installation går altid til fallback. Hvis browseren
-ikke åbner automatisk, står URL'en i terminalen.
+Linux-implementeringen er en udviklerstub. SketchUp-trinnet åbner den
+officielle downloadside i standardbrowseren. Hvis browseren ikke åbner
+automatisk, står URL'en i terminalen.

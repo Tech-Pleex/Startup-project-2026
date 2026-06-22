@@ -7,19 +7,17 @@ package steps
 type Kind string
 
 const (
-	KindManual   Kind = "manual"
-	KindWifi     Kind = "wifi"
-	KindLink     Kind = "link"
-	KindSketchUp Kind = "sketchup"
-	KindFinish   Kind = "finish"
+	KindManual Kind = "manual"
+	KindWifi   Kind = "wifi"
+	KindLink   Kind = "link"
+	KindFinish Kind = "finish"
 )
 
 // Konfigurationsværdier porteret fra $Script:SetupConfig.
 const (
-	Title             = "GF2 IT Setup"
-	TargetWifi        = "NEG"
-	GuestWifi         = "NEG Guest"
-	SketchUpPackageID = "Trimble.SketchUp.2026"
+	Title      = "GF2 IT Setup"
+	TargetWifi = "NEG"
+	GuestWifi  = "NEG Guest"
 
 	SafetyText = "Assistenten beder aldrig om adgangskoder, MitID eller UNI-Login. " +
 		"Elever indtaster kun oplysninger på officielle sider og i Windows' egne indstillinger."
@@ -33,7 +31,7 @@ const (
 	URLPraxis            = "https://online.praxis.dk/"
 	URLOneDrive          = "https://www.office.com/launch/onedrive"
 	URLTrimbleInvitation = "https://www.office.com/"
-	URLSketchUpFallback  = "https://sketchup.trimble.com/"
+	URLSketchUpDownload  = "https://sketchup.trimble.com/en/download/all"
 	URLDashboard         = "https://tech-pleex.github.io/Startup-project-2026/start.html"
 )
 
@@ -62,7 +60,7 @@ func All() []Step {
 			ID:     "wifi",
 			Title:  "Wi-Fi",
 			Kind:   KindWifi,
-			Body:   "Du skal ende på NEG-netværket. Hvis du allerede er på NEG, markerer Assistenten trinnet som gennemført. Brug kun NEG Guest som midlertidigt gæstenet, hvis skolens personale beder om det.",
+			Body:   "Åbn Wi-Fi-indstillinger, forbind til NEG, og kontrollér selv at forbindelsen virker. Markér derefter trinnet som færdigt.",
 			Button: "Åbn Wi-Fi-indstillinger",
 		},
 		{
@@ -117,10 +115,10 @@ func All() []Step {
 		{
 			ID:     "sketchup",
 			Title:  "SketchUp",
-			Kind:   KindSketchUp,
-			Body:   "Assistenten kan forsøge at installere SketchUp via winget-pakken Trimble.SketchUp.2026. Hvis det ikke virker, bruger du manuel fallback til SketchUp-siden.",
-			URL:    URLSketchUpFallback,
-			Button: "Installer SketchUp",
+			Kind:   KindLink,
+			Body:   "Hent den korrekte SketchUp-version fra den officielle side. Log ind og følg Trimble-flowet med din skolemail.",
+			URL:    URLSketchUpDownload,
+			Button: "Åbn SketchUp-download",
 		},
 		{
 			ID:     "finish",

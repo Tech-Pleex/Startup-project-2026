@@ -84,7 +84,28 @@ main {
   margin: 12px 0;
 }
 
-#action, #toggle-done, #wifi-check, #wifi-settings, #quit {
+.smode-warning {
+  background: #fff1f1;
+  border: 1px solid #e35d5d;
+  border-left: 4px solid #c62828;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.smode-warning h3 { margin: 0 0 8px; color: #8b1d1d; }
+
+#smode-retry {
+  font: inherit;
+  background: #fff;
+  color: #8b1d1d;
+  border: 1px solid #c62828;
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+#action, #toggle-done, #wifi-settings, #quit {
   font: inherit;
   background: var(--neg-blue);
   color: #fff;
@@ -95,7 +116,7 @@ main {
   cursor: pointer;
 }
 
-#action:hover, #wifi-check:hover, #wifi-settings:hover, #quit:hover {
+#action:hover, #wifi-settings:hover, #quit:hover {
   background: var(--neg-blue-dark);
 }
 
@@ -117,6 +138,8 @@ main {
 }
 
 .nav-controls button:disabled { opacity: 0.4; cursor: default; }
+
+.step-item:disabled, #toggle-done:disabled { opacity: 0.4; cursor: default; }
 
 footer {
   background: var(--surface);
