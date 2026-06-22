@@ -112,53 +112,6 @@ func TestMarkUnknownStepReturnsNotFound(t *testing.T) {
 	}
 }
 
-func TestWifiStatusClassifiesNetworks(t *testing.T) {
-	cases := []struct {
-		name, ssid, wantState string
-	}{
-		{"på NEG", "NEG", "target"},
-		{"på NEG Guest", "NEG Guest", "guest"},
-		{"ukendt netværk", "Naboens Netværk", "other"},
-		{"intet netværk", "", "none"},
-	}
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			srv := New(&osfake.Fake{SSID: tc.ssid})
-			rec := do(t, srv, http.MethodGet, "/api/wifi")
-			if rec.Code != http.StatusOK {
-				t.Fatalf("status = %d, forventede 200", rec.Code)
-			}
-			var resp struct {
-				SSID  string `json:"ssid"`
-				State string `json:"state"`
-			}
-			if err := json.Unmarshal(rec.Body.Bytes(), &resp); err != nil {
-				t.Fatalf("ugyldig JSON: %v", err)
-			}
-			if resp.State != tc.wantState || resp.SSID != tc.ssid {
-				t.Errorf("svar = %+v, forventede ssid=%q state=%q", resp, tc.ssid, tc.wantState)
-			}
-		})
-	}
-}
-
-func TestWifiStatusReportsOSError(t *testing.T) {
-	srv := New(&osfake.Fake{SSIDErr: errors.New("netsh fejlede")})
-	rec := do(t, srv, http.MethodGet, "/api/wifi")
-	if rec.Code != http.StatusInternalServerError {
-		t.Fatalf("status = %d, forventede 500", rec.Code)
-	}
-	var resp struct {
-		Error string `json:"error"`
-	}
-	if err := json.Unmarshal(rec.Body.Bytes(), &resp); err != nil {
-		t.Fatalf("ugyldig JSON: %v", err)
-	}
-	if resp.Error == "" {
-		t.Errorf("fejlsvaret mangler en error-besked")
-	}
-}
-
 func TestOpenWifiSettings(t *testing.T) {
 	fake := &osfake.Fake{}
 	srv := New(fake)
@@ -179,6 +132,19 @@ func TestOpenStepOpensConfiguredURL(t *testing.T) {
 	}
 	if len(fake.OpenedURLs) != 1 || fake.OpenedURLs[0] != steps.URLMoodle {
 		t.Errorf("åbnede URL'er = %v, forventede [%q]", fake.OpenedURLs, steps.URLMoodle)
+	}
+}
+
+func TestOpenSketchUpStepOpensOfficialDownload(t *testing.T) {
+	fake := &osfake.Fake{}
+	srv := New(fake)
+
+	rec := do(t, srv, http.MethodPost, "/api/steps/sketchup/open")
+	if rec.Code != http.StatusNoContent {
+		t.Fatalf("status = %d, forventede 204", rec.Code)
+	}
+	if len(fake.OpenedURLs) != 1 || fake.OpenedURLs[0] != steps.URLSketchUpDownload {
+		t.Errorf("åbnede URL'er = %v, forventede [%q]", fake.OpenedURLs, steps.URLSketchUpDownload)
 	}
 }
 
@@ -232,40 +198,30 @@ func TestOpenURLLessStepReturnsJSONError(t *testing.T) {
 	}
 }
 
-func TestSketchUpInstallReportsOutcome(t *testing.T) {
-	cases := []struct {
-		name       string
-		fake       *osfake.Fake
-		wantAction string
-		wantReason bool
+func TestSystemStatusReportsSMode(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		fake *osfake.Fake
+		want bool
 	}{
-		{"winget virker", &osfake.Fake{WingetOK: true}, "installed", false},
-		{"S-mode", &osfake.Fake{WingetOK: true, InSMode: true}, "fallback", true},
-		{"winget mangler", &osfake.Fake{}, "fallback", true},
-		{"winget fejler", &osfake.Fake{WingetOK: true, InstallErr: errors.New("fejlkode 1")}, "fallback", true},
-	}
-	for _, tc := range cases {
+		{"inaktiv", &osfake.Fake{}, false},
+		{"aktiv", &osfake.Fake{InSMode: true}, true},
+		{"ukendt", &osfake.Fake{SModeErr: errors.New("reg fejlede")}, false},
+	} {
 		t.Run(tc.name, func(t *testing.T) {
 			srv := New(tc.fake)
-			rec := do(t, srv, http.MethodPost, "/api/sketchup/install")
+			rec := do(t, srv, http.MethodGet, "/api/system")
 			if rec.Code != http.StatusOK {
 				t.Fatalf("status = %d, forventede 200", rec.Code)
 			}
 			var resp struct {
-				Action string `json:"action"`
-				Reason string `json:"reason"`
+				SMode bool `json:"sMode"`
 			}
 			if err := json.Unmarshal(rec.Body.Bytes(), &resp); err != nil {
 				t.Fatalf("ugyldig JSON: %v", err)
 			}
-			if resp.Action != tc.wantAction {
-				t.Errorf("action = %q, forventede %q", resp.Action, tc.wantAction)
-			}
-			if tc.wantReason && resp.Reason == "" {
-				t.Errorf("fallback uden elevvendt begrundelse")
-			}
-			if !tc.wantReason && resp.Reason != "" {
-				t.Errorf("reason = %q ved vellykket installation, forventede tom streng", resp.Reason)
+			if resp.SMode != tc.want {
+				t.Errorf("sMode = %v, forventede %v", resp.SMode, tc.want)
 			}
 		})
 	}
@@ -306,6 +262,15 @@ func TestIndexServesTringuideWithSafetyText(t *testing.T) {
 	}
 	if !strings.Contains(body, "Assistenten") {
 		t.Errorf("siden bruger ikke navnet Assistenten")
+	}
+	for _, want := range []string{
+		"Windows S-mode er aktiveret",
+		"Assistenten kan ikke fortsætte",
+		"Tjek igen",
+	} {
+		if !strings.Contains(body, want) {
+			t.Errorf("siden mangler %q", want)
+		}
 	}
 }
 
