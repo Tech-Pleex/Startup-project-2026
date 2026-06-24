@@ -31,7 +31,7 @@ async function refresh() {
 
 // Fremdrift mod virkelighed: andel af ikke-finish-trin der er markeret done.
 function sceneProgress() {
-  const renderable = allSteps.filter(s => s.kind !== "finish");
+  const renderable = allSteps.filter(s => s.kind !== "finish" && s.id !== "welcome");
   if (renderable.length === 0) return 0;
   return renderable.filter(s => s.done).length / renderable.length;
 }
@@ -87,12 +87,15 @@ function render() {
   action.hidden = !hasAction;
   action.textContent = step.button;
 
+  const isWelcome = step.id === "welcome";
+
   const toggleDone = $("toggle-done");
+  toggleDone.hidden = isWelcome;
   toggleDone.textContent = step.done ? "Fortryd" : "Markér som færdig";
   toggleDone.disabled = sModeBlocked;
 
   const skip = $("skip");
-  skip.hidden = step.kind === "finish";
+  skip.hidden = step.kind === "finish" || isWelcome;
   skip.textContent = step.skipped ? "Fortryd spring over" : "Spring over";
   skip.disabled = sModeBlocked;
 
