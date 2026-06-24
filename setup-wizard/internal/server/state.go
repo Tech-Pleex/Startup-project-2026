@@ -55,6 +55,9 @@ func (st *state) list() []stepView {
 func (st *state) setStatus(id, status string) bool {
 	st.mu.Lock()
 	defer st.mu.Unlock()
+	if status != "" && status != "done" && status != "skipped" {
+		return false
+	}
 	if _, ok := st.byIDLocked(id); !ok {
 		return false
 	}

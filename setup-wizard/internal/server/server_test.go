@@ -325,7 +325,9 @@ func TestSkipStepReopenAndComplete(t *testing.T) {
 	}
 
 	// Skip og dernæst markér færdig -> done rydder skipped.
-	do(t, srv, http.MethodPost, "/api/steps/sketchup/skip")
+	if rec := do(t, srv, http.MethodPost, "/api/steps/sketchup/skip"); rec.Code != http.StatusNoContent {
+		t.Fatalf("skip: status = %d, forventede 204", rec.Code)
+	}
 	if rec := do(t, srv, http.MethodPost, "/api/steps/sketchup/done"); rec.Code != http.StatusNoContent {
 		t.Fatalf("done: status = %d, forventede 204", rec.Code)
 	}
