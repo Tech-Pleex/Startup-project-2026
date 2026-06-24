@@ -22,6 +22,7 @@ type stepJSON struct {
 	Warning string `json:"warning"`
 	Button  string `json:"button"`
 	Done    bool   `json:"done"`
+	Skipped bool   `json:"skipped"`
 }
 
 type stepsResponse struct {
@@ -299,5 +300,54 @@ func TestEmbeddedAssetsContainNoInternalNames(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatalf("kunne ikke gennemgå indlejrede filer: %v", err)
+	}
+}
+
+func TestSkipStepReopenAndComplete(t *testing.T) {
+	srv := New(&osfake.Fake{})
+
+	// Spring sketchup over.
+	if rec := do(t, srv, http.MethodPost, "/api/steps/sketchup/skip"); rec.Code != http.StatusNoContent {
+		t.Fatalf("skip: status = %d, forventede 204", rec.Code)
+	}
+	s := findStep(t, getSteps(t, srv), "sketchup")
+	if !s.Skipped || s.Done {
+		t.Errorf("efter skip: skipped=%v done=%v, forventede skipped=true done=false", s.Skipped, s.Done)
+	}
+
+	// Genåbn (undo) -> hverken done eller skipped.
+	if rec := do(t, srv, http.MethodPost, "/api/steps/sketchup/undo"); rec.Code != http.StatusNoContent {
+		t.Fatalf("undo: status = %d, forventede 204", rec.Code)
+	}
+	s = findStep(t, getSteps(t, srv), "sketchup")
+	if s.Skipped || s.Done {
+		t.Errorf("efter undo: skipped=%v done=%v, forventede begge false", s.Skipped, s.Done)
+	}
+
+	// Skip og dernæst markér færdig -> done rydder skipped.
+	do(t, srv, http.MethodPost, "/api/steps/sketchup/skip")
+	if rec := do(t, srv, http.MethodPost, "/api/steps/sketchup/done"); rec.Code != http.StatusNoContent {
+		t.Fatalf("done: status = %d, forventede 204", rec.Code)
+	}
+	s = findStep(t, getSteps(t, srv), "sketchup")
+	if !s.Done || s.Skipped {
+		t.Errorf("efter done: done=%v skipped=%v, forventede done=true skipped=false", s.Done, s.Skipped)
+	}
+}
+
+func TestSkipLastStep(t *testing.T) {
+	srv := New(&osfake.Fake{})
+	if rec := do(t, srv, http.MethodPost, "/api/steps/finish/skip"); rec.Code != http.StatusNoContent {
+		t.Fatalf("skip finish: status = %d, forventede 204", rec.Code)
+	}
+	if !findStep(t, getSteps(t, srv), "finish").Skipped {
+		t.Errorf("finish-trinnet er ikke markeret sprunget over")
+	}
+}
+
+func TestSkipUnknownStepReturnsNotFound(t *testing.T) {
+	srv := New(&osfake.Fake{})
+	if rec := do(t, srv, http.MethodPost, "/api/steps/findes-ikke/skip"); rec.Code != http.StatusNotFound {
+		t.Errorf("status = %d, forventede 404", rec.Code)
 	}
 }
