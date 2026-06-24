@@ -353,3 +353,16 @@ func TestSkipUnknownStepReturnsNotFound(t *testing.T) {
 		t.Errorf("status = %d, forventede 404", rec.Code)
 	}
 }
+
+func TestBrandAssetsAreServed(t *testing.T) {
+	srv := New(&osfake.Fake{})
+	for _, path := range []string{
+		"/static/fonts/space-grotesk.woff2",
+		"/static/img/neg-hero.jpg",
+		"/static/img/neg-logo-white.png",
+	} {
+		if rec := do(t, srv, http.MethodGet, path); rec.Code != http.StatusOK {
+			t.Errorf("GET %s: status = %d, forventede 200", path, rec.Code)
+		}
+	}
+}
