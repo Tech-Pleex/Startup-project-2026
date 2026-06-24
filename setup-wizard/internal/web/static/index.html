@@ -7,36 +7,62 @@
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <header>
-    <h1>GF2 IT Setup</h1>
-    <p id="progress">Indlæser …</p>
+  <header class="topbar">
+    <div class="brand">
+      <img src="/static/img/neg-logo-white.png" alt="NEG" class="logo">
+      <span class="brand-tag">IT-Opsætning · Assistenten</span>
+    </div>
+    <div class="progress-wrap">
+      <span id="progress" class="progress-label">Indlæser …</span>
+      <span class="bar"><i id="progress-bar"></i></span>
+    </div>
   </header>
-  <main>
-    <nav id="step-list" aria-label="Trinliste"></nav>
-    <section id="step-detail">
-      <h2 id="step-title"></h2>
-      <p id="step-body"></p>
-      <div id="smode-warning" class="smode-warning" role="alert" hidden>
-        <h3>Windows S-mode er aktiveret</h3>
-        <p>Assistenten kan ikke fortsætte, mens computeren kører i S-mode. Kontakt din lærer eller IT, slå S-mode fra, og prøv igen.</p>
-        <button id="smode-retry">Tjek igen</button>
-      </div>
-      <div id="step-warning" class="warning" hidden></div>
-      <div id="wifi-panel" hidden>
-        <button id="wifi-settings">Åbn Wi-Fi-indstillinger</button>
-      </div>
-      <button id="action" hidden></button>
-      <button id="quit" hidden>Afslut Assistenten</button>
-      <div class="step-controls">
-        <button id="toggle-done"></button>
-      </div>
-      <div class="nav-controls">
-        <button id="prev">Tilbage</button>
-        <button id="next">Frem</button>
-      </div>
-    </section>
+
+  <section class="scene" aria-hidden="true">
+    <img id="scene-full" class="scene-img" src="/static/img/neg-hero.jpg" alt="">
+    <img id="scene-blueprint" class="scene-img scene-bp" src="/static/img/neg-hero.jpg" alt="">
+    <div class="scene-grid"></div>
+    <div class="scene-cap">Blueprint → virkelighed · scenen bygges trin for trin</div>
+  </section>
+
+  <nav id="step-rail" class="rail" aria-label="Trinliste"></nav>
+
+  <main class="card">
+    <p id="step-kicker" class="kicker"></p>
+    <h2 id="step-title"></h2>
+    <p id="step-body"></p>
+
+    <div id="smode-warning" class="smode-warning" role="alert" hidden>
+      <h3>Windows S-mode er aktiveret</h3>
+      <p>Assistenten kan ikke fortsætte, mens computeren kører i S-mode. Kontakt din lærer eller IT, slå S-mode fra, og prøv igen.</p>
+      <button id="smode-retry">Tjek igen</button>
+    </div>
+
+    <div id="step-warning" class="warning" hidden></div>
+
+    <div id="wifi-panel" hidden>
+      <button id="wifi-settings" class="btn btn-done">Åbn Wi-Fi-indstillinger</button>
+    </div>
+
+    <div class="actions">
+      <button id="action" class="btn btn-primary" hidden></button>
+      <button id="toggle-done" class="btn btn-done"></button>
+      <button id="skip" class="btn btn-skip"></button>
+    </div>
+
+    <button id="quit" class="btn btn-primary" hidden>Afslut Assistenten</button>
+
+    <div class="nav-controls">
+      <button id="prev">‹ Tilbage</button>
+      <button id="next">Frem ›</button>
+    </div>
   </main>
-  <footer>Assistenten beder aldrig om adgangskoder, MitID eller UNI-Login. Elever indtaster kun oplysninger på officielle sider og i Windows' egne indstillinger.</footer>
+
+  <footer class="safety">
+    <span class="shield" aria-hidden="true">🛡️</span>
+    <p>Assistenten beder aldrig om adgangskoder, MitID eller UNI-Login. Elever indtaster kun oplysninger på officielle sider og i Windows' egne indstillinger.</p>
+  </footer>
+
   <script src="/static/app.js"></script>
 </body>
 </html>
