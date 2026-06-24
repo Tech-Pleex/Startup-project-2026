@@ -1,0 +1,41 @@
+MIT License
+
+Copyright (c) 2026 Jesper Reenberg
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+Trademark and brand notice (not part of the MIT license grant)
+
+The MIT license above applies ONLY to the source code in this repository.
+
+It does NOT grant any rights to trademarks, logos, brand names, brand guides,
+or other brand assets, including but not limited to:
+
+  - "NEG" / Nordvestsjællands Erhvervs- og Gymnasieuddannelser (name, logo,
+    brand guide, colors and fonts) — property of NEG.
+  - Trimble / SketchUp — property of Trimble Inc.
+  - Microsoft, Microsoft Store, Windows — property of Microsoft Corporation.
+  - Apple, App Store, macOS — property of Apple Inc.
+
+All such marks remain the property of their respective owners. Use of the NEG
+brand in this project is by permission of NEG and is not transferred by this
+license. Nothing in this repository should be read as an official product of,
+or endorsement by, any of the above parties.

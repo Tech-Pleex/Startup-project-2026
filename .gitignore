@@ -2,3 +2,9 @@
 dist/qa-extract/
 99_arkiv/
 setup-wizard/dist/
+
+# Lokal brandmappe – må ikke på GitHub
+NEG BRAND/
+
+# Internt brev til ledelsen – må ikke offentliggøres
+BREV-til-chef-brandtilladelse.md
