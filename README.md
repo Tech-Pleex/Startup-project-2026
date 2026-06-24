@@ -70,3 +70,23 @@ Release checklist:
 4. Ask the student to open the downloaded Assistenten file.
 5. The Assistenten starts a local browser guide and never asks for passwords,
    MitID, or UNI-Login.
+
+## License
+
+The source code in this repository is released under the **MIT License** (see
+[LICENSE](LICENSE)). You are free to use, modify, and distribute the code,
+including for NEG to take over and maintain the project at any time.
+
+## Brand and trademarks
+
+The MIT License covers the **source code only** — not brands or trademarks.
+
+- **NEG** (Nordvestsjællands Erhvervs- og Gymnasieuddannelser): the NEG name,
+  logo, brand guide, colors, and fonts are the property of NEG and are used in
+  this project **with NEG's permission**. They are not part of the MIT license
+  grant and may not be reused without NEG's consent.
+- **Trimble / SketchUp**, **Microsoft / Windows / Microsoft Store**, and
+  **Apple / App Store / macOS** are trademarks of their respective owners.
+
+This project is a student onboarding helper and is **not** an official product
+of, or endorsed by, any of the above parties.

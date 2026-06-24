@@ -34,8 +34,9 @@ func New(osImpl osops.OS) *Server {
 		quit:  make(chan struct{}),
 	}
 	s.mux.HandleFunc("GET /api/steps", s.handleSteps)
-	s.mux.HandleFunc("POST /api/steps/{id}/done", s.handleSetDone(true))
-	s.mux.HandleFunc("POST /api/steps/{id}/undo", s.handleSetDone(false))
+	s.mux.HandleFunc("POST /api/steps/{id}/done", s.handleSetStatus("done"))
+	s.mux.HandleFunc("POST /api/steps/{id}/undo", s.handleSetStatus(""))
+	s.mux.HandleFunc("POST /api/steps/{id}/skip", s.handleSetStatus("skipped"))
 	s.mux.HandleFunc("POST /api/steps/{id}/open", s.handleOpen)
 	s.mux.HandleFunc("GET /api/system", s.handleSystem)
 	s.mux.HandleFunc("POST /api/wifi/settings", s.handleWifiSettings)
@@ -60,9 +61,10 @@ func writeJSON(w http.ResponseWriter, v any) {
 	}
 }
 
-func (s *Server) handleSetDone(done bool) http.HandlerFunc {
+// handleSetStatus opdaterer et trins status (done/skipped/pending).
+func (s *Server) handleSetStatus(status string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !s.state.setDone(r.PathValue("id"), done) {
+		if !s.state.setStatus(r.PathValue("id"), status) {
 			http.NotFound(w, r)
 			return
 		}
