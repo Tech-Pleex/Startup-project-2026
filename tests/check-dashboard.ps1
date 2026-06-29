@@ -4,6 +4,8 @@ $Root = Split-Path -Parent $PSScriptRoot
 $GitAttributes = Join-Path $Root ".gitattributes"
 $StartHtml = Join-Path $Root "start.html"
 $HeroImage = Join-Path $Root "assets\neg-hero-transition.png"
+$BrandFont = Join-Path $Root "assets\fonts\space-grotesk.woff2"
+$BrandLogo = Join-Path $Root "assets\neg-logo.png"
 $WindowsSetup = Join-Path $Root "scripts\setup-windows.ps1"
 $SetupConfig = Join-Path $Root "scripts\setup-config.ps1"
 $SetupChecks = Join-Path $Root "scripts\setup-checks.ps1"
@@ -64,6 +66,8 @@ function Assert-StartsWithBytes {
 Assert-File $GitAttributes
 Assert-File $StartHtml
 Assert-File $HeroImage
+Assert-File $BrandFont
+Assert-File $BrandLogo
 Assert-File $WindowsSetup
 Assert-File $SetupConfig
 Assert-File $SetupChecks
@@ -87,8 +91,10 @@ Assert-Contains $Html "assets/neg-hero-transition.png" "local hero asset"
 Assert-Contains $Html "Elev" "student mode"
 Assert-Contains $Html "Underviser" "teacher mode"
 Assert-Contains $Html "Ikke startet" "status label"
-Assert-Contains $Html "I gang" "status label"
 Assert-Contains $Html "Færdig" "status label"
+Assert-Contains $Html 'type="checkbox"' "compact done-checkbox replaces status dropdown"
+Assert-Contains $Html "done-toggle" "done toggle control"
+Assert-NotContains $Html "status-control select" "old status dropdown removed"
 Assert-Contains $Html "gf2-it-dashboard.studentStatus" "student localStorage key"
 Assert-Contains $Html "gf2-it-dashboard.teacherStatus" "teacher localStorage key"
 Assert-Contains $Html "setup=complete" "setup completion URL signal"
@@ -98,6 +104,38 @@ Assert-Contains $Html ".step p {" "dashboard step body style"
 Assert-Contains $Html "font-size: 13px;" "smaller dashboard step body text"
 Assert-Contains $Html "Download setup" "dashboard download page link"
 Assert-Contains $Html 'href="index.html"' "dashboard links back to landing page"
+
+# --- NEG brand (#29): palet, font og officielt logo ---
+Assert-Contains $Html "Space Grotesk" "NEG brand font Space Grotesk"
+Assert-Contains $Html "assets/fonts/space-grotesk.woff2" "locally bundled brand font"
+Assert-Contains $Html '@font-face' "font bundled offline, no CDN"
+Assert-Contains $Html "#123c62" "NEG navy palette color"
+Assert-Contains $Html "#86afd8" "NEG blue palette color"
+Assert-Contains $Html "#ec8113" "NEG orange palette color"
+Assert-Contains $Html '#efefef' "NEG grey palette color"
+Assert-Contains $Html 'src="assets/neg-logo.png"' "official NEG logo image (not redrawn)"
+Assert-NotContains $Html "#005aa7" "off-brand blue removed"
+
+# --- Layout (#3): tjekliste-domineret, fremgang og kontekstuelle links ---
+Assert-Contains $Html "panel-main" "checklist is the dominant panel"
+Assert-Contains $Html "grid-template-columns: 3fr 1fr;" "checklist 3/4 vs sidebar 1/4 layout"
+Assert-Contains $Html "grid-template-columns: repeat(3, 1fr);" "steps render in three columns"
+Assert-Contains $Html 'class="shell"' "page split into checklist + right column"
+Assert-Contains $Html "hero-media" "hero image shares the right column with the sidebar"
+Assert-Contains $Html "col-side" "sidebar column same width as hero image"
+Assert-Contains $Html 'id="progressBar"' "progress bar element"
+Assert-Contains $Html 'id="progressCount"' "progress count element"
+Assert-Contains $Html "af 8 færdige" "student progress wording"
+Assert-Contains $Html "step-links" "contextual quicklinks at steps"
+Assert-Contains $Html "function makeChip" "contextual link chip rendering"
+Assert-Contains $Html "linkByKey" "links referenced by key, not duplicated"
+
+# --- Lærer-reminder + selvbetjening (#7) ---
+Assert-Contains $Html "https://selvbetjening.neg.dk/UMSLogin/weblogin.aspx?ReturnUrl=%2f" "NEG selvbetjening link"
+Assert-Contains $Html "udskriv bruger" "teacher self-service workflow reminder"
+Assert-Contains $Html "glemt mail eller login" "teacher forgotten-login step"
+# Selvbetjening er tilgængelig for elever (skift egen adgangskode) såvel som undervisere.
+Assert-Contains $Html "skifte din adgangskode" "student self-service password wording"
 Assert-NotContains $Html "Vælg computer" "dashboard platform chooser removed"
 Assert-NotContains $Html 'data-platform="windows"' "Windows platform button removed"
 Assert-NotContains $Html 'data-platform="mac"' "Mac platform button removed"
@@ -152,7 +190,10 @@ Assert-Contains $GitAttributesContent "*.command text eol=lf" "Mac launcher LF e
 
 Assert-NotContains $Html "url(`"http" "remote CSS image"
 Assert-NotContains $Html "src=`"http" "remote image/script source"
-Assert-NotContains $Html "ReturnUrl=" "sessionful Praxis URL"
+# Selvbetjenings-login'et (#7) bruger ReturnUrl=%2f (tilbage til roden) og er bevidst tilladt.
+# Sessionfulde service-URL'er er stadig forbudt:
+Assert-NotContains $Html "online.praxis.dk/?ReturnUrl" "sessionful Praxis URL"
+Assert-Contains $Html "https://online.praxis.dk/" "Praxis uses clean root URL"
 Assert-NotContains $Html "id.trimble.com/ui/sign_in.html?state=" "sessionful Trimble URL"
 Assert-NotContains $Html "password" "credential wording"
 Assert-NotContains $Html "adgangskode gemmes" "stored password wording"
