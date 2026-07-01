@@ -10,6 +10,8 @@ type Fake struct {
 	InSMode    bool
 	SModeErr   error
 	OpenURLErr error
+	Desktop    string // returneres af DesktopDir; sæt til en temp-mappe i test
+	DesktopErr error
 
 	OpenedURLs        []string
 	WifiSettingsOpens int
@@ -28,3 +30,5 @@ func (f *Fake) OpenURL(url string) error {
 }
 
 func (f *Fake) SMode() (bool, error) { return f.InSMode, f.SModeErr }
+
+func (f *Fake) DesktopDir() (string, error) { return f.Desktop, f.DesktopErr }

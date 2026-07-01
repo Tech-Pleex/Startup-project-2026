@@ -18,6 +18,8 @@ func (Linux) OpenURL(url string) error {
 	return exec.Command("xdg-open", url).Start()
 }
 
+func (Linux) DesktopDir() (string, error) { return desktopDir() }
+
 func (Linux) SMode() (bool, error) { return false, nil }
 
 // Current returnerer OS-implementeringen for den platform binæren er bygget til.

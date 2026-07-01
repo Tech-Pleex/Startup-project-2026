@@ -15,6 +15,7 @@ const api = {
   skip: id => postOK(`/api/steps/${id}/skip`),
   open: id => postOK(`/api/steps/${id}/open`),
   wifiSettings: () => postOK("/api/wifi/settings"),
+  dashboard: () => postOK("/api/dashboard").then(r => r.json()),
   quit: () => postOK("/api/quit"),
 };
 
@@ -144,6 +145,21 @@ document.addEventListener("keydown", e => {
 
 $("action").addEventListener("click", async () => {
   const step = allSteps[current];
+  // Færdig-trinnet genererer et personligt dashboard på skrivebordet med
+  // flueben ud fra de trin eleven har markeret som færdige.
+  if (step.kind === "finish") {
+    const action = $("action");
+    action.disabled = true;
+    try {
+      const res = await api.dashboard();
+      $("step-body").textContent = `Dit dashboard er gemt på skrivebordet: ${res.path}`;
+      action.textContent = "Dashboard gemt ✓";
+    } catch (err) {
+      action.disabled = false;
+      alert("Dashboardet kunne ikke gemmes. Prøv igen, eller åbn dashboardet manuelt.");
+    }
+    return;
+  }
   try { await api.open(step.id); }
   catch (err) { alert("Siden kunne ikke åbnes. Prøv at åbne den manuelt i din browser."); }
 });

@@ -69,6 +69,18 @@ func (st *state) setStatus(id, status string) bool {
 	return true
 }
 
+// rawStatus returnerer en kopi af trin-status (id -> "done"/"skipped").
+// Bruges til at generere dashboardet med elevens fremdrift.
+func (st *state) rawStatus() map[string]string {
+	st.mu.Lock()
+	defer st.mu.Unlock()
+	out := make(map[string]string, len(st.status))
+	for id, status := range st.status {
+		out[id] = status
+	}
+	return out
+}
+
 // byID slår et trin op i konfigurationen.
 func (st *state) byID(id string) (steps.Step, bool) {
 	st.mu.Lock()

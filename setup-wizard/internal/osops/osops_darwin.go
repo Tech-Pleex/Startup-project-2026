@@ -19,6 +19,8 @@ func (Darwin) OpenURL(url string) error {
 	return exec.Command("open", url).Start()
 }
 
+func (Darwin) DesktopDir() (string, error) { return desktopDir() }
+
 func (Darwin) SMode() (bool, error) {
 	return false, nil
 }

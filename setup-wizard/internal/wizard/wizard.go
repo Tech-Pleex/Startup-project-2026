@@ -23,7 +23,12 @@ func (w *Wizard) SMode() (bool, error) {
 	return w.os.SMode()
 }
 
-// OpenURL åbner en officiel side i elevens standardbrowser.
+// OpenURL åbner en officiel side (eller en lokal filsti) i standardprogrammet.
 func (w *Wizard) OpenURL(url string) error {
 	return w.os.OpenURL(url)
+}
+
+// DesktopDir returnerer stien til elevens skrivebord.
+func (w *Wizard) DesktopDir() (string, error) {
+	return w.os.DesktopDir()
 }

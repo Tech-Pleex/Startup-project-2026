@@ -27,6 +27,8 @@ func openWithShell(target string) error {
 	return exec.Command("rundll32", "url.dll,FileProtocolHandler", target).Start()
 }
 
+func (Windows) DesktopDir() (string, error) { return desktopDir() }
+
 func (Windows) SMode() (bool, error) {
 	cmd := exec.Command("reg", "query",
 		`HKLM\SYSTEM\CurrentControlSet\Control\CI\Policy`,
