@@ -5,67 +5,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>GF2 IT Dashboard</title>
   <style>
+    /* NEG brand-locked · Space Grotesk (lokal) · lyst tjekliste-tema */
+    @font-face {
+      font-family: "Space Grotesk";
+      src: url("assets/fonts/space-grotesk.woff2") format("woff2");
+      font-weight: 300 700;
+      font-display: swap;
+    }
+
     :root {
-      --ink: #181818;
-      --muted: #5c6670;
-      --line: #dce4ea;
-      --paper: #f4f7f9;
+      --navy: #123c62;
+      --navy-deep: #0d2f4f;
+      --blue: #86afd8;
+      --blue-soft: #eaf1f8;
+      --grey: #efefef;
+      --orange: #ec8113;
+      --orange-soft: #fdeed9;
+      --ink: #16334d;
+      --muted: #5d7184;
+      --line: #d8e2ec;
       --surface: #ffffff;
-      --neg-blue: #005aa7;
-      --neg-blue-dark: #003f73;
-      --neg-blue-soft: #e7f2fb;
-      --lime: #d8e85a;
-      --amber: #efb43f;
-      --green: #237a4b;
-      --red: #b84232;
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: var(--paper);
+      font-family: "Space Grotesk", system-ui, Arial, Helvetica, sans-serif;
+      font-weight: 400;
+      background: var(--grey);
       color: var(--ink);
-      letter-spacing: 0;
     }
 
     button, a, select { font: inherit; }
 
+    .lbl { font-weight: 500; letter-spacing: .12em; text-transform: uppercase; }
+
+    /* topbar */
     .topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 18px;
-      padding: 16px 28px;
+      padding: 14px 28px;
       background: var(--surface);
       border-bottom: 1px solid var(--line);
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      min-width: 0;
-      font-weight: 900;
-    }
-
-    .brand-mark {
-      display: grid;
-      place-items: center;
-      width: 54px;
-      height: 54px;
-      border-radius: 4px;
-      background: var(--neg-blue);
-      color: #fff;
-      flex: 0 0 auto;
-    }
-
-    .brand small {
+    .brand { display: flex; align-items: center; gap: 16px; min-width: 0; }
+    .brand .logo { height: 40px; width: auto; display: block; flex: 0 0 auto; }
+    .brand .brand-text { font-weight: 700; color: var(--navy); line-height: 1.15; }
+    .brand .brand-text small {
       display: block;
       margin-top: 3px;
       color: var(--muted);
-      font-weight: 700;
+      font-weight: 500;
+      font-size: 12.5px;
     }
 
     .mode-toggle {
@@ -75,90 +70,86 @@
       padding: 5px;
       border: 1px solid var(--line);
       border-radius: 999px;
-      background: #eef3f6;
+      background: var(--grey);
+      flex: 0 0 auto;
     }
 
     .mode-toggle button {
       border: 0;
       border-radius: 999px;
-      padding: 9px 14px;
+      padding: 9px 16px;
       background: transparent;
       color: var(--muted);
-      font-weight: 900;
+      font-weight: 500;
       cursor: pointer;
     }
 
     .mode-toggle button[aria-pressed="true"] {
-      background: var(--neg-blue);
+      background: var(--navy);
       color: #fff;
     }
 
-    .credit {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-      margin-top: 12px;
-      text-align: right;
-    }
-
-    .hero {
-      min-height: 350px;
+    /* helsides 3:1 gitter — hero-billedet deler højre kolonne med sidebaren,
+       så billedet har præcis samme bredde som links-boksen nedenunder */
+    .shell {
       display: grid;
-      grid-template-columns: minmax(300px, 0.5fr) minmax(360px, 0.5fr);
-      background:
-        linear-gradient(90deg, var(--neg-blue) 0%, var(--neg-blue) 41%, rgba(0,90,167,0.82) 58%, rgba(0,90,167,0.1) 80%, rgba(0,90,167,0) 100%),
-        url("assets/neg-hero-transition.png") right center / auto 100% no-repeat,
-        var(--neg-blue);
-      color: #fff;
-      overflow: hidden;
+      grid-template-columns: 3fr 1fr;
     }
 
     .hero-copy {
-      align-self: center;
-      padding: 52px 58px;
+      grid-column: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 300px;
+      padding: 50px 40px;
+      background: var(--navy);
+      color: #fff;
+    }
+
+    .hero-media {
+      grid-column: 2;
+      min-height: 300px;
+      background:
+        url("assets/neg-hero-transition.png") right center / cover no-repeat,
+        var(--navy);
     }
 
     .kicker {
       margin-bottom: 14px;
-      color: var(--lime);
-      font-size: 13px;
-      font-weight: 900;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: .14em;
       text-transform: uppercase;
     }
 
     h1 {
       margin: 0;
-      max-width: 680px;
-      font-size: 46px;
-      line-height: 1.04;
-      letter-spacing: 0;
+      max-width: 640px;
+      font-size: 44px;
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -.01em;
     }
 
-    .hero p {
+    .hero-copy p {
       margin: 18px 0 0;
-      max-width: 620px;
-      color: #eef5f8;
+      max-width: 600px;
+      color: #dce8f4;
       font-size: 16px;
-      line-height: 1.45;
+      line-height: 1.5;
     }
 
-    .wrap {
-      max-width: 1260px;
-      margin: 0 auto;
-      padding: 26px;
-    }
-
-    .dashboard {
-      display: grid;
-      grid-template-columns: 300px minmax(0, 1fr) 280px;
-      gap: 18px;
-      align-items: start;
-    }
+    /* indholdsrækken deler samme kolonner som hero-rækken */
+    .col-main { grid-column: 1; padding: 26px 14px 26px 40px; min-width: 0; }
+    /* venstre 0-padding = start uændret ved hero/navy-grænsen; 40px højre = samme margen som venstre kolonne har mod kanten */
+    .col-side { grid-column: 2; padding: 26px 40px 26px 0; }
 
     .panel {
       background: var(--surface);
       border: 1px solid var(--line);
-      border-radius: 6px;
+      border-radius: 12px;
       overflow: hidden;
     }
 
@@ -167,176 +158,219 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      padding: 15px 16px;
+      padding: 16px 18px;
       border-bottom: 1px solid var(--line);
-      font-weight: 900;
+      font-weight: 700;
+      color: var(--navy);
     }
 
-    .panel-body { padding: 16px; }
+    .panel-header .muted-label {
+      font-weight: 500;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
 
-    .primary-action,
-    .secondary-action {
+    .panel-body { padding: 18px; }
+
+    /* fremgang */
+    .progress { margin-bottom: 18px; }
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+    .progress-count { font-weight: 700; color: var(--navy); font-size: 15px; }
+    .progress-hint { font-size: 12px; color: var(--muted); }
+    .bar {
+      height: 10px;
+      border-radius: 6px;
+      background: var(--grey);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+    .bar > i {
       display: block;
-      width: 100%;
-      margin-top: 12px;
-      border-radius: 4px;
-      padding: 13px 14px;
-      text-align: center;
-      text-decoration: none;
-      font-weight: 900;
+      height: 100%;
+      width: 0;
+      background: var(--blue);
+      transition: width .4s ease;
     }
 
-    .primary-action {
-      border: 0;
-      background: var(--neg-blue);
-      color: #fff;
-    }
-
-    .secondary-action {
-      border: 1px solid var(--ink);
-      background: #fff;
-      color: var(--ink);
-    }
-
-    .notice {
-      margin-top: 14px;
-      padding: 13px;
-      border-left: 5px solid var(--amber);
-      background: #fff8e6;
-      color: #463914;
-      line-height: 1.42;
-      font-size: 14px;
-    }
-
-    .steps {
-      display: grid;
-      gap: 12px;
-    }
+    /* trin — 3 kolonner × 3 høj (8 trin + ét tomt felt), alle kort lige store */
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 1fr; gap: 14px; }
 
     .step {
       display: grid;
-      grid-template-columns: 40px minmax(0, 1fr) 128px;
+      grid-template-columns: 44px minmax(0, 1fr);
       gap: 14px;
-      align-items: start;
-      padding: 15px;
+      align-items: stretch;
+      padding: 16px 18px;
       border: 1px solid var(--line);
-      border-radius: 6px;
-      background: #fff;
+      border-left: 5px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface);
+      transition: border-color .2s ease, background .2s ease;
     }
+
+    .step.is-done { border-left-color: var(--blue); background: var(--blue-soft); }
+
+    .step-main { display: flex; flex-direction: column; min-width: 0; }
 
     .num {
       display: grid;
       place-items: center;
-      width: 38px;
-      height: 38px;
-      border-radius: 4px;
-      background: var(--neg-blue);
+      align-self: start;
+      width: 44px;
+      height: 44px;
+      border-radius: 9px;
+      background: var(--navy);
       color: #fff;
-      font-weight: 900;
+      font-weight: 700;
+      font-size: 17px;
     }
+    .step.is-done .num { background: var(--blue); color: var(--navy-deep); }
 
-    .step h3 {
-      margin: 0 0 6px;
-      font-size: 18px;
-      line-height: 1.2;
-    }
+    .step-head { display: flex; align-items: flex-start; gap: 10px; }
+    .step h3 { flex: 1 1 auto; margin: 0 0 6px; font-size: 17px; font-weight: 700; line-height: 1.22; color: var(--navy); }
+    .step p { margin: 0; color: var(--muted); font-size: 13.5px; line-height: 1.45; }
 
-    .step p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.38;
-    }
-
-    .status-control {
-      display: grid;
-      gap: 6px;
-    }
-
-    .status-control label {
+    .done-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: 0 0 auto;
       font-size: 12px;
+      font-weight: 700;
       color: var(--muted);
-      font-weight: 900;
+      cursor: pointer;
+      white-space: nowrap;
+      user-select: none;
     }
+    .done-toggle input { width: 18px; height: 18px; margin: 0; accent-color: var(--blue); cursor: pointer; }
+    .step.is-done .done-toggle { color: var(--navy); }
 
-    .status-control select {
+    .step-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 12px;
+      border: 1px solid var(--blue);
+      border-radius: 999px;
+      background: var(--blue-soft);
+      color: var(--navy);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 13px;
+    }
+    .chip:hover { background: var(--blue); }
+    .chip .arrow { color: var(--orange); font-weight: 700; }
+
+    /* kompakt underviser-visning — samme 2×4 som elev */
+    .steps.compact { gap: 12px; }
+    .steps.compact .step { grid-template-columns: 34px minmax(0, 1fr); padding: 13px 14px; gap: 12px; }
+    .steps.compact .num { width: 34px; height: 34px; font-size: 14px; border-radius: 8px; }
+    .steps.compact h3 { font-size: 15.5px; }
+    .steps.compact p { font-size: 13px; }
+    /* lærer-reminderen (#7) fremhæves med orange, men fylder kun én celle som de øvrige */
+    .step.teacher-reminder { border-left-color: var(--orange); background: var(--orange-soft); }
+
+    /* sidebar */
+    .primary-action, .secondary-action {
+      display: block;
       width: 100%;
-      border: 1px solid var(--line);
-      border-radius: 4px;
-      padding: 8px;
-      background: #f6f8f9;
-      color: var(--ink);
-      font-weight: 800;
+      margin-top: 12px;
+      border-radius: 9px;
+      padding: 14px;
+      text-align: center;
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .primary-action { border: 0; background: var(--orange); color: #2a1804; }
+    .secondary-action { border: 1.5px solid var(--navy); background: #fff; color: var(--navy); }
+
+    .notice {
+      margin-top: 14px;
+      padding: 13px 14px;
+      border-radius: 9px;
+      font-size: 14px;
+      line-height: 1.45;
+      background: var(--orange-soft);
+      border: 1px solid var(--orange);
+      border-left: 5px solid var(--orange);
+      color: #6b3d08;
+    }
+    .notice.info {
+      background: var(--blue-soft);
+      border-color: var(--blue);
+      border-left-color: var(--blue);
+      color: var(--navy);
     }
 
-    .status-control select[data-status="I gang"] {
-      border-color: var(--amber);
-      background: #fff4d8;
-    }
-
-    .status-control select[data-status="Færdig"] {
-      border-color: var(--green);
-      background: #e7f6ed;
-      color: var(--green);
-    }
-
-    .quicklinks {
-      display: grid;
-      gap: 9px;
-    }
-
+    .quicklinks { display: grid; gap: 9px; }
     .quicklink {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      padding: 12px 13px;
+      padding: 12px 14px;
       border: 1px solid var(--line);
-      border-radius: 4px;
+      border-radius: 9px;
       background: #fff;
-      color: var(--ink);
+      color: var(--navy);
       text-decoration: none;
-      font-weight: 900;
+      font-weight: 500;
     }
+    .quicklink:hover { border-color: var(--blue); background: var(--blue-soft); }
+    .quicklink .open { color: var(--orange); font-weight: 700; font-size: 13px; }
 
-    .quicklink span:last-child {
-      color: var(--neg-blue);
-    }
-
-    .manual {
-      margin-top: 18px;
-    }
-
-    .manual summary {
-      cursor: pointer;
-      font-weight: 900;
-    }
-
-    .manual ol {
-      margin: 12px 0 0;
-      padding-left: 22px;
+    .links-subhead {
+      margin: 18px 0 4px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
       color: var(--muted);
-      line-height: 1.5;
     }
+
+    .credit { color: var(--muted); font-size: 12px; font-weight: 500; margin-top: 16px; text-align: right; }
+
+    .manual { margin-top: 18px; }
+    .manual summary { cursor: pointer; font-weight: 700; color: var(--navy); }
+    .manual ol { margin: 12px 0 0; padding-left: 22px; color: var(--muted); line-height: 1.55; }
 
     .hidden { display: none; }
 
-    @media (max-width: 1000px) {
-      .topbar { align-items: flex-start; flex-direction: column; }
-      .hero { grid-template-columns: 1fr; }
-      .hero-copy { padding: 42px 26px; }
-      h1 { font-size: 34px; }
-      .dashboard { grid-template-columns: 1fr; }
+    /* responsivt — skole-laptop 1366×768 holder 3:1, smallere falder sammen */
+    @media (max-width: 1100px) {
+      .shell { grid-template-columns: 1fr; }
+      .hero-copy, .hero-media, .col-main, .col-side { grid-column: 1; }
+      .hero-media { min-height: 170px; }
+      .col-main { padding: 24px 18px 0; }
+      .col-side { padding: 0 18px 24px; }
+      .steps { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 720px) {
+      .topbar { flex-direction: column; align-items: flex-start; }
+      .hero-copy { padding: 40px 22px; min-height: 0; }
+      h1 { font-size: 32px; }
+      .steps, .steps.compact { grid-template-columns: 1fr; }
       .step { grid-template-columns: 40px minmax(0, 1fr); }
-      .status-control { grid-column: 2; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .bar > i, .step { transition: none; }
     }
   </style>
 </head>
 <body>
   <header class="topbar">
     <div class="brand">
-      <div class="brand-mark" aria-hidden="true">NEG</div>
-      <div>
+      <img class="logo" src="assets/neg-logo.png" alt="NEG">
+      <div class="brand-text">
         GF2 IT Dashboard
         <small>Opstart, links og lokal status</small>
       </div>
@@ -347,33 +381,32 @@
     </div>
   </header>
 
-  <section class="hero">
-    <div class="hero-copy">
+  <div class="shell">
+    <section class="hero-copy">
       <div class="kicker">ET FÆLLESSKAB MED PLADS TIL DIG</div>
       <h1>Kom sikkert i gang med IT på GF2</h1>
       <p>Følg rækkefølgen første skoledag, og brug dashboardet igen når du skal finde Office, Moodle, Lectio, PraxisOnline, OneDrive eller SketchUp.</p>
-    </div>
-  </section>
+    </section>
+    <div class="hero-media" aria-hidden="true"></div>
 
-  <main class="wrap">
-    <div class="dashboard">
-      <aside class="panel">
-        <div class="panel-header">Kom i gang</div>
-        <div class="panel-body">
-          <a class="primary-action" href="index.html">Download setup</a>
-          <a class="secondary-action" href="#manualGuide">Manuel vejledning</a>
-          <div class="notice">Chromebook kan ikke bruges til dette GF2-flow. Windows må ikke være i S-mode, hvis programmer skal installeres.</div>
-        </div>
-      </aside>
-
-      <section class="panel" aria-live="polite">
+    <main class="col-main">
+      <section class="panel panel-main" aria-live="polite">
         <div class="panel-header">
           <span id="mainTitle">Opstart første dag</span>
-          <span>Status gemmes lokalt</span>
+          <span class="muted-label">Status gemmes lokalt</span>
         </div>
         <div class="panel-body">
+          <div class="progress">
+            <div class="progress-top">
+              <span id="progressCount" class="progress-count">0 af 8 færdige</span>
+              <span id="progressHint" class="progress-hint">Marker hvert trin når du er klar</span>
+            </div>
+            <div class="bar"><i id="progressBar"></i></div>
+          </div>
+
           <div id="studentSteps" class="steps"></div>
-          <div id="teacherSteps" class="steps hidden"></div>
+          <div id="teacherSteps" class="steps compact hidden"></div>
+
           <details id="manualGuide" class="manual">
             <summary>Manuel vejledning</summary>
             <ol>
@@ -387,49 +420,61 @@
           </details>
         </div>
       </section>
+    </main>
 
-      <aside class="panel">
-        <div class="panel-header">Faste links</div>
+    <aside class="col-side">
+      <section class="panel">
+        <div class="panel-header">Kom i gang &amp; links</div>
         <div class="panel-body">
+          <a class="primary-action" href="index.html">Download setup</a>
+          <a class="secondary-action" href="#manualGuide">Manuel vejledning</a>
+
+          <div class="links-subhead">Faste links</div>
           <div id="quickLinks" class="quicklinks"></div>
+
           <div class="notice"><strong>Syg eller fravær?</strong><br>Ring til +45 72 290 100 mellem kl. 8.00-9.00.</div>
-          <div class="notice">Dashboardet gemmer kun status lokalt i browseren. Det gemmer aldrig brugernavne, adgangskoder eller MitID-oplysninger.</div>
           <div class="credit">Udviklet af Jesper Reenberg</div>
         </div>
-      </aside>
-    </div>
-  </main>
+      </section>
+    </aside>
+  </div>
 
   <script>
+    // Link-data: én ren, identificerbar blok (forberedt til #30 Go-SSOT).
+    // Selvbetjening bruges af både elever (skift egen adgangskode) og undervisere (udskriv bruger).
     const links = [
-      ["Office 365 / skolemail", "https://www.office.com/"],
-      ["Moodle", "https://online.neg.dk/login/index.php"],
-      ["Lectio", "https://www.lectio.dk/lectio/769/default.aspx"],
-      ["PraxisOnline", "https://online.praxis.dk/"],
-      ["OneDrive", "https://www.office.com/launch/onedrive"],
-      ["SketchUp / Trimble", "https://sketchup.trimble.com/"],
-      ["NEG hjemmeside", "https://www.neg.dk/"]
+      { key: "office",        label: "Office 365 / skolemail", url: "https://www.office.com/",                              audience: "all" },
+      { key: "moodle",        label: "Moodle",                 url: "https://online.neg.dk/login/index.php",                audience: "all" },
+      { key: "lectio",        label: "Lectio",                 url: "https://www.lectio.dk/lectio/769/default.aspx",        audience: "all" },
+      { key: "praxis",        label: "PraxisOnline",           url: "https://online.praxis.dk/",                            audience: "all" },
+      { key: "onedrive",      label: "OneDrive",               url: "https://www.office.com/launch/onedrive",               audience: "all" },
+      { key: "sketchup",      label: "SketchUp / Trimble",     url: "https://sketchup.trimble.com/",                        audience: "all" },
+      { key: "neg",           label: "NEG hjemmeside",         url: "https://www.neg.dk/",                                  audience: "all" },
+      { key: "selvbetjening", label: "NEG selvbetjening",      url: "https://selvbetjening.neg.dk/UMSLogin/weblogin.aspx?ReturnUrl=%2f", audience: "all" }
     ];
 
+    const linkByKey = Object.fromEntries(links.map(link => [link.key, link]));
+
     const studentSteps = [
-      ["Få NEG-login", "Få udleveret NEG-brugernavn og adgangskode. Skriv ikke oplysningerne i dashboardet."],
-      ["Log på skolens Wi-Fi", "Brug dit NEG-login til skolens netværk før du åbner de øvrige systemer."],
-      ["Åbn Office 365 og skolemail", "Log på Office.com og kontroller at du kan læse skolemail."],
-      ["Find SketchUp/Trimble-invitationen", "Åbn skolemailen og find invitationen til SketchUp/Trimble-flowet."],
-      ["Log på Moodle", "Brug samme NEG-login til Moodle og tjek at dine GF2-rum vises."],
-      ["Log på PraxisOnline og Lectio", "Brug MitID til PraxisOnline og Lectio. Dashboardet kan kun åbne siderne."],
-      ["Installer eller åbn SketchUp", "Installer SketchUp hvis nødvendigt, og opret eller log ind på Trimble-profil via skolemail-flowet."],
-      ["Gem opgaver i OneDrive", "Brug OneDrive via Office 365 som fast sted til opgaver og filer."]
+      { title: "Få NEG-login", body: "Få udleveret NEG-brugernavn og adgangskode. Skriv ikke oplysningerne i dashboardet. Du kan selv skifte din adgangskode på NEG selvbetjening.", links: ["selvbetjening"] },
+      { title: "Log på skolens Wi-Fi", body: "Brug dit NEG-login til skolens netværk før du åbner de øvrige systemer.", links: [] },
+      { title: "Åbn Office 365 og skolemail", body: "Log på Office.com og kontroller at du kan læse skolemail.", links: ["office"] },
+      { title: "Find SketchUp/Trimble-invitationen", body: "Åbn skolemailen og find invitationen til SketchUp/Trimble-flowet.", links: ["office"] },
+      { title: "Log på Moodle", body: "Brug samme NEG-login til Moodle og tjek at dine GF2-rum vises.", links: ["moodle"] },
+      { title: "Log på PraxisOnline og Lectio", body: "Brug MitID til PraxisOnline og Lectio. Dashboardet kan kun åbne siderne.", links: ["praxis", "lectio"] },
+      { title: "Installer eller åbn SketchUp", body: "Installer SketchUp hvis nødvendigt, og opret eller log ind på Trimble-profil via skolemail-flowet.", links: ["sketchup"] },
+      { title: "Gem opgaver i OneDrive", body: "Brug OneDrive via Office 365 som fast sted til opgaver og filer.", links: ["onedrive"] }
     ];
 
     const teacherSteps = [
-      ["Tjek Wi-Fi", "Bekræft at eleven er på skolens Wi-Fi med NEG-login."],
-      ["Bekræft Office og skolemail", "Kontroller at Office.com virker, og at eleven kan åbne skolemail."],
-      ["Bekræft Moodle", "Kontroller at Moodle virker med elevens NEG-login."],
-      ["Forklar SketchUp og Trimble", "Scriptet kan hjælpe med installation, men Trimble/licens kræver elevens skolemail-flow."],
-      ["Forklar MitID-sporet", "Lectio og PraxisOnline kræver MitID. Scriptet kan kun åbne de rigtige sider."],
-      ["Bekræft OneDrive", "Eleven skal bruge OneDrive til filer. FileCloud/P-drev er ikke en del af elevflowet."],
-      ["Tjek typiske fejl", "Windows S-mode, Chromebook, forkert login, manglende skolemail og manglende MitID er de hyppigste blokeringer."]
+      { title: "Tjek Wi-Fi", body: "Bekræft at eleven er på skolens Wi-Fi med NEG-login.", links: [] },
+      { title: "Bekræft Office og skolemail", body: "Kontroller at Office.com virker, og at eleven kan åbne skolemail.", links: ["office"] },
+      { title: "Bekræft Moodle", body: "Kontroller at Moodle virker med elevens NEG-login.", links: ["moodle"] },
+      { title: "Forklar SketchUp og Trimble", body: "Scriptet kan hjælpe med installation, men Trimble/licens kræver elevens skolemail-flow.", links: ["sketchup"] },
+      { title: "Forklar MitID-sporet", body: "Lectio og PraxisOnline kræver MitID. Scriptet kan kun åbne de rigtige sider.", links: ["praxis", "lectio"] },
+      { title: "Bekræft OneDrive", body: "Eleven skal bruge OneDrive til filer. FileCloud/P-drev er ikke en del af elevflowet.", links: ["onedrive"] },
+      { title: "Tjek typiske fejl", body: "Windows S-mode, Chromebook, forkert login, manglende skolemail og manglende MitID er de hyppigste blokeringer.", links: [] },
+      { title: "Elev har glemt mail eller login?", body: "Log ind på NEG selvbetjening, find eleven og vælg „udskriv bruger”. Eleven får sit brugernavn og den aktive adgangskode. Dashboardet linker kun ud — det gemmer ingen oplysninger.", links: ["selvbetjening"], reminder: true }
     ];
 
     const storage = {
@@ -437,8 +482,6 @@
       student: "gf2-it-dashboard.studentStatus",
       teacher: "gf2-it-dashboard.teacherStatus"
     };
-
-    const statusLabels = ["Ikke startet", "I gang", "Færdig"];
 
     function readJson(key, fallback) {
       try {
@@ -453,49 +496,103 @@
       localStorage.setItem(key, JSON.stringify(value));
     }
 
-    function renderLinks() {
-      const holder = document.getElementById("quickLinks");
-      holder.innerHTML = "";
-      links.forEach(([label, url]) => {
-        const link = document.createElement("a");
-        link.className = "quicklink";
-        link.href = url;
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
-        link.innerHTML = `<span>${label}</span><span>Åbn</span>`;
-        holder.appendChild(link);
-      });
+    function makeQuicklink(link) {
+      const a = document.createElement("a");
+      a.className = "quicklink";
+      a.href = link.url;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.innerHTML = `<span>${link.label}</span><span class="open">Åbn ›</span>`;
+      return a;
     }
 
-    function renderSteps(targetId, items, key) {
+    function renderLinks() {
+      const all = document.getElementById("quickLinks");
+      all.innerHTML = "";
+      links.forEach(link => all.appendChild(makeQuicklink(link)));
+    }
+
+    function makeChip(key) {
+      const link = linkByKey[key];
+      if (!link) return null;
+      const a = document.createElement("a");
+      a.className = "chip";
+      a.href = link.url;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.innerHTML = `<span>${link.label}</span><span class="arrow">›</span>`;
+      return a;
+    }
+
+    function applyStepState(article, status, index) {
+      const done = status === "Færdig";
+      article.classList.toggle("is-done", done);
+      const num = article.querySelector(".num");
+      num.textContent = done ? "✓" : String(index + 1);
+    }
+
+    function renderSteps(targetId, items, key, mode) {
       const holder = document.getElementById(targetId);
       const statuses = readJson(key, {});
       holder.innerHTML = "";
-      items.forEach(([title, body], index) => {
+      items.forEach((item, index) => {
         const article = document.createElement("article");
-        article.className = "step";
-        const current = statuses[index] || "Ikke startet";
+        article.className = item.reminder ? "step teacher-reminder" : "step";
+        const current = statuses[index] === "Færdig" ? "Færdig" : "Ikke startet";
+        const inputId = `${targetId}-${index}`;
+
+        const chips = (item.links || [])
+          .map(makeChip)
+          .filter(Boolean);
+        const linksHtml = chips.length ? `<div class="step-links"></div>` : "";
+
         article.innerHTML = `
-          <div class="num">${index + 1}</div>
-          <div>
-            <h3>${title}</h3>
-            <p>${body}</p>
-          </div>
-          <div class="status-control">
-            <label for="${targetId}-${index}">Status</label>
-            <select id="${targetId}-${index}" data-status="${current}">
-              ${statusLabels.map(label => `<option value="${label}" ${label === current ? "selected" : ""}>${label}</option>`).join("")}
-            </select>
+          <div class="num" aria-hidden="true">${index + 1}</div>
+          <div class="step-main">
+            <div class="step-head">
+              <h3>${item.title}</h3>
+              <label class="done-toggle" for="${inputId}">
+                <input type="checkbox" id="${inputId}" ${current === "Færdig" ? "checked" : ""}>
+                <span>Færdig</span>
+              </label>
+            </div>
+            <p>${item.body}</p>
+            ${linksHtml}
           </div>
         `;
-        const select = article.querySelector("select");
-        select.addEventListener("change", () => {
-          statuses[index] = select.value;
-          select.dataset.status = select.value;
+
+        if (chips.length) {
+          const linkHolder = article.querySelector(".step-links");
+          chips.forEach(chip => linkHolder.appendChild(chip));
+        }
+
+        applyStepState(article, current, index);
+
+        const checkbox = article.querySelector('input[type="checkbox"]');
+        checkbox.addEventListener("change", () => {
+          const status = checkbox.checked ? "Færdig" : "Ikke startet";
+          statuses[index] = status;
           writeJson(key, statuses);
+          applyStepState(article, status, index);
+          updateProgress(mode);
         });
+
         holder.appendChild(article);
       });
+    }
+
+    function updateProgress(mode) {
+      const items = mode === "teacher" ? teacherSteps : studentSteps;
+      const key = mode === "teacher" ? storage.teacher : storage.student;
+      const statuses = readJson(key, {});
+      const done = items.reduce((sum, _item, index) => sum + (statuses[index] === "Færdig" ? 1 : 0), 0);
+      const total = items.length;
+      const noun = mode === "teacher" ? "gennemgået" : "færdige";
+      document.getElementById("progressCount").textContent = `${done} af ${total} ${noun}`;
+      document.getElementById("progressHint").textContent = done === total
+        ? (mode === "teacher" ? "Alle trin gennemgået" : "Alle trin er færdige – godt gået!")
+        : (mode === "teacher" ? "Marker hvert trin når det er verificeret" : "Marker hvert trin når du er klar");
+      document.getElementById("progressBar").style.width = `${Math.round((done / total) * 100)}%`;
     }
 
     function fillStudentStatus(status) {
@@ -523,11 +620,13 @@
 
     function setMode(mode) {
       localStorage.setItem(storage.mode, mode);
-      document.getElementById("studentMode").setAttribute("aria-pressed", String(mode === "student"));
-      document.getElementById("teacherMode").setAttribute("aria-pressed", String(mode === "teacher"));
-      document.getElementById("studentSteps").classList.toggle("hidden", mode !== "student");
-      document.getElementById("teacherSteps").classList.toggle("hidden", mode !== "teacher");
-      document.getElementById("mainTitle").textContent = mode === "teacher" ? "Underviser-tjekliste" : "Opstart første dag";
+      const isTeacher = mode === "teacher";
+      document.getElementById("studentMode").setAttribute("aria-pressed", String(!isTeacher));
+      document.getElementById("teacherMode").setAttribute("aria-pressed", String(isTeacher));
+      document.getElementById("studentSteps").classList.toggle("hidden", isTeacher);
+      document.getElementById("teacherSteps").classList.toggle("hidden", !isTeacher);
+      document.getElementById("mainTitle").textContent = isTeacher ? "Underviser-tjekliste" : "Opstart første dag";
+      updateProgress(mode);
     }
 
     document.getElementById("studentMode").addEventListener("click", () => setMode("student"));
@@ -535,8 +634,8 @@
 
     applySetupCompletionFromUrl();
     renderLinks();
-    renderSteps("studentSteps", studentSteps, storage.student);
-    renderSteps("teacherSteps", teacherSteps, storage.teacher);
+    renderSteps("studentSteps", studentSteps, storage.student, "student");
+    renderSteps("teacherSteps", teacherSteps, storage.teacher, "teacher");
     setMode(localStorage.getItem(storage.mode) || "student");
   </script>
 </body>
