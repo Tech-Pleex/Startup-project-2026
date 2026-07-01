@@ -124,9 +124,9 @@ func All() []Step {
 			ID:     "finish",
 			Title:  "Færdig",
 			Kind:   KindFinish,
-			Body:   "Du er igennem alle trin. Assistenten kan åbne dashboardet med hurtige links til skolesystemerne, så du nemt finder dem igen.",
+			Body:   "Du er igennem alle trin. Assistenten gemmer et personligt dashboard på dit skrivebord med flueben ved de trin du har markeret som færdige — og hurtige links til skolesystemerne, så du nemt finder dem igen.",
 			URL:    URLDashboard,
-			Button: "Åbn dashboard",
+			Button: "Gem dashboard på skrivebordet",
 		},
 	}
 }

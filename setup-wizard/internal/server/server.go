@@ -6,8 +6,11 @@ package server
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"sync"
 
 	"github.com/Tech-Pleex/Startup-project-2026/setup-wizard/internal/osops"
@@ -15,6 +18,9 @@ import (
 	"github.com/Tech-Pleex/Startup-project-2026/setup-wizard/internal/web"
 	"github.com/Tech-Pleex/Startup-project-2026/setup-wizard/internal/wizard"
 )
+
+// dashboardFileName er navnet på den genererede dashboard-fil på skrivebordet.
+const dashboardFileName = "GF2-IT-Dashboard.html"
 
 // Server er Assistentens HTTP-API. Den implementerer http.Handler og
 // holder al tilstand, så main kan være tynd.
@@ -40,6 +46,7 @@ func New(osImpl osops.OS) *Server {
 	s.mux.HandleFunc("POST /api/steps/{id}/open", s.handleOpen)
 	s.mux.HandleFunc("GET /api/system", s.handleSystem)
 	s.mux.HandleFunc("POST /api/wifi/settings", s.handleWifiSettings)
+	s.mux.HandleFunc("POST /api/dashboard", s.handleDashboard)
 	s.mux.HandleFunc("POST /api/quit", s.handleQuit)
 	s.mux.Handle("GET /static/", http.FileServerFS(web.Static))
 	s.mux.HandleFunc("GET /", s.handleIndex)
@@ -113,6 +120,44 @@ func (s *Server) handleOpen(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
+}
+
+// handleDashboard genererer en personlig, selvstændig dashboard-fil med
+// elevens fremdrift og gemmer den på skrivebordet. Filen åbnes best-effort;
+// selv hvis åbning fejler, er filen gemt og stien returneres.
+func (s *Server) handleDashboard(w http.ResponseWriter, r *http.Request) {
+	dir, err := s.wiz.DesktopDir()
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, fmt.Errorf("kunne ikke finde skrivebordet: %w", err))
+		return
+	}
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		writeError(w, http.StatusInternalServerError, fmt.Errorf("kunne ikke oprette skrivebordsmappen: %w", err))
+		return
+	}
+
+	path := filepath.Join(dir, dashboardFileName)
+	f, err := os.Create(path)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, fmt.Errorf("kunne ikke oprette dashboard-filen: %w", err))
+		return
+	}
+	studentStatus := web.StudentStatusFromWizard(s.state.rawStatus())
+	if renderErr := web.RenderDashboard(f, studentStatus); renderErr != nil {
+		f.Close()
+		writeError(w, http.StatusInternalServerError, fmt.Errorf("kunne ikke generere dashboardet: %w", renderErr))
+		return
+	}
+	if err := f.Close(); err != nil {
+		writeError(w, http.StatusInternalServerError, fmt.Errorf("kunne ikke gemme dashboard-filen: %w", err))
+		return
+	}
+
+	// Åbning er best-effort: filen er allerede gemt.
+	if err := s.wiz.OpenURL(path); err != nil {
+		log.Printf("dashboard gemt (%s) men kunne ikke åbnes automatisk: %v", path, err)
+	}
+	writeJSON(w, map[string]string{"path": path})
 }
 
 // Quit lukkes når eleven afslutter Assistenten; main venter på kanalen.

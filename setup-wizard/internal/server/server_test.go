@@ -6,6 +6,8 @@ import (
 	"io/fs"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -364,5 +366,51 @@ func TestBrandAssetsAreServed(t *testing.T) {
 		if rec := do(t, srv, http.MethodGet, path); rec.Code != http.StatusOK {
 			t.Errorf("GET %s: status = %d, forventede 200", path, rec.Code)
 		}
+	}
+}
+
+func TestDashboardWritesToDesktop(t *testing.T) {
+	desktop := t.TempDir()
+	fake := &osfake.Fake{Desktop: desktop}
+	srv := New(fake)
+
+	// Marker wifi + office færdige; det giver flueben på dashboardets
+	// studentSteps 0, 1 og 2.
+	for _, id := range []string{"wifi", "office"} {
+		if rec := do(t, srv, http.MethodPost, "/api/steps/"+id+"/done"); rec.Code != http.StatusNoContent {
+			t.Fatalf("done %s: status = %d", id, rec.Code)
+		}
+	}
+
+	rec := do(t, srv, http.MethodPost, "/api/dashboard")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("POST /api/dashboard: status = %d, forventede 200 (%s)", rec.Code, rec.Body.String())
+	}
+
+	var resp struct {
+		Path string `json:"path"`
+	}
+	if err := json.Unmarshal(rec.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("ugyldig JSON: %v", err)
+	}
+	if filepath.Dir(resp.Path) != desktop {
+		t.Errorf("filen blev gemt i %q, forventede skrivebordet %q", filepath.Dir(resp.Path), desktop)
+	}
+
+	data, err := os.ReadFile(resp.Path)
+	if err != nil {
+		t.Fatalf("dashboard-filen blev ikke skrevet: %v", err)
+	}
+	html := string(data)
+	if !strings.Contains(html, "data:font/woff2;base64,") {
+		t.Error("den gemte fil er ikke selvstændig (mangler indlejret font)")
+	}
+	if !strings.Contains(html, `"0":"Færdig"`) {
+		t.Error("den gemte fil mangler elevens flueben")
+	}
+
+	// Filen skal være forsøgt åbnet for eleven.
+	if len(fake.OpenedURLs) != 1 || fake.OpenedURLs[0] != resp.Path {
+		t.Errorf("forventede at filen blev åbnet (%s), fik %v", resp.Path, fake.OpenedURLs)
 	}
 }
