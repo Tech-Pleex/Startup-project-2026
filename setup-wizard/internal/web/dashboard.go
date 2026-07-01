@@ -57,6 +57,7 @@ func StudentStatusFromWizard(status map[string]string) map[string]string {
 type dashboardData struct {
 	FontDataURI       template.URL
 	LogoDataURI       template.URL
+	HeroDataURI       template.URL
 	StudentStatusJSON template.JS
 }
 
@@ -70,6 +71,10 @@ func RenderDashboard(w io.Writer, studentStatus map[string]string) error {
 	logo, err := Static.ReadFile("static/img/neg-logo.png")
 	if err != nil {
 		return fmt.Errorf("kunne ikke læse logo: %w", err)
+	}
+	hero, err := Static.ReadFile("static/img/neg-hero.jpg")
+	if err != nil {
+		return fmt.Errorf("kunne ikke læse hero-billede: %w", err)
 	}
 	// map[string]string marshaller til deterministisk (sorteret) JSON, så
 	// output er stabilt og testbart.
@@ -85,6 +90,7 @@ func RenderDashboard(w io.Writer, studentStatus map[string]string) error {
 	return tmpl.Execute(w, dashboardData{
 		FontDataURI:       dataURI("font/woff2", font),
 		LogoDataURI:       dataURI("image/png", logo),
+		HeroDataURI:       dataURI("image/jpeg", hero),
 		StudentStatusJSON: template.JS(statusJSON),
 	})
 }

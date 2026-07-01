@@ -69,7 +69,7 @@ func TestRenderDashboardSelfContained(t *testing.T) {
 
 	// Selvstændig: font + logo skal være indlejret som data-URI'er, ingen
 	// løse asset-stier tilbage.
-	for _, needle := range []string{"data:font/woff2;base64,", "data:image/png;base64,"} {
+	for _, needle := range []string{"data:font/woff2;base64,", "data:image/png;base64,", "data:image/jpeg;base64,"} {
 		if !strings.Contains(html, needle) {
 			t.Errorf("output mangler indlejret asset %q", needle)
 		}
